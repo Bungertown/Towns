@@ -1,0 +1,4 @@
+name: BungerTowns
+version: '${version}'
+main: town.bunger.towns.plugin.BungerTownsPlugin
+api-version: '1.20'
