@@ -4,30 +4,31 @@ create table "${tablePrefix}resident"
     "name"        CHARACTER VARYING                not null,
     "created"     TIMESTAMP default LOCALTIMESTAMP not null,
     "last_joined" TIMESTAMP default NULL,
-    "town"        INTEGER   default NULL,
-    "metadata"    JSON      default '{}'           not null,
+    "town_id"     INTEGER   default NULL,
+    "metadata"    JSON      default JSON '{}'      not null,
     constraint "resident_pk"
         primary key ("id")
 );
 
 create table "${tablePrefix}town"
 (
-    "id"       INTEGER auto_increment,
-    "name"     CHARACTER VARYING     not null
+    "id"          INTEGER auto_increment,
+    "name"        CHARACTER VARYING                  not null
         constraint "town_uk_name"
             unique,
-    "owner"    UUID                  not null,
-    "open"     BOOLEAN default FALSE not null,
-    "public"   BOOLEAN default FALSE not null,
-    "metadata" JSON    default '{}'  not null,
+    "owner_id"    UUID                               not null,
+    "created"     TIMESTAMP default LOCALTIMESTAMP   not null,
+    "open"        BOOLEAN   default FALSE            not null,
+    "public"      BOOLEAN   default FALSE            not null,
+    "metadata"    JSON      default '{}'             not null,
     constraint "town_pk"
         primary key ("id"),
     constraint "town_resident_id_fk"
-        foreign key ("owner") references "${tablePrefix}resident"
+        foreign key ("owner_id") references "${tablePrefix}resident"
 );
 
 alter table "${tablePrefix}resident"
     add constraint "resident_town_id_fk"
-        foreign key ("town") references "${tablePrefix}town"
+        foreign key ("town_id") references "${tablePrefix}town"
             on delete set null;
 

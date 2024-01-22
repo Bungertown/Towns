@@ -25,13 +25,14 @@ repositories {
             snapshotsOnly()
         }
     }
-
+    maven("https://jitpack.io")
 }
 
 dependencies {
     // Paper
     compileOnly("io.papermc.paper:paper-api:1.20-R0.1-SNAPSHOT")
     // Command framework
+
     implementation("cloud.commandframework:cloud-paper:2.0.0-SNAPSHOT")
     implementation("cloud.commandframework:cloud-annotations:2.0.0-SNAPSHOT")
     implementation("cloud.commandframework:cloud-minecraft-extras:2.0.0-SNAPSHOT")
@@ -46,6 +47,9 @@ dependencies {
     implementation("org.spongepowered:configurate-hocon:4.1.2")
     // Caching
     implementation("com.github.ben-manes.caffeine:caffeine:3.1.8")
+    // Nullness
+    compileOnly("org.jspecify:jspecify:0.3.0")
+    implementation(project(":api"))
 }
 
 flyway {
@@ -91,10 +95,6 @@ jooq {
         }
     }
 }
-
-//                    "url" to "jdbc:postgresql://localhost:5432/minecraft",
-//                    "username" to "bungertown",
-//                    "password" to "banana",
 
 java {
     toolchain.languageVersion.set(JavaLanguageVersion.of(17))
