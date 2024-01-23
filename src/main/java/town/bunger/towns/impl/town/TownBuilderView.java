@@ -84,6 +84,11 @@ public final class TownBuilderView implements TownView {
     }
 
     @Override
+    public boolean hasResident(UUID uuid) {
+        return this.owner().id().equals(uuid);
+    }
+
+    @Override
     public @NotNull Iterable<? extends Audience> audiences() {
         return List.of(this.owner());
     }

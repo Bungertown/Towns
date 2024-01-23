@@ -87,6 +87,11 @@ public final class WrappedTownView implements TownView {
     }
 
     @Override
+    public boolean hasResident(UUID uuid) {
+        return this.town.hasResident(uuid);
+    }
+
+    @Override
     public @NotNull Iterable<? extends Audience> audiences() {
         return this.town.audiences();
     }

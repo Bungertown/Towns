@@ -229,6 +229,11 @@ public final class TownImpl implements Town {
     }
 
     @Override
+    public boolean hasResident(UUID uuid) {
+        return this.residents.contains(uuid);
+    }
+
+    @Override
     public @NotNull Iterable<? extends Audience> audiences() {
         return List.copyOf(this.loadedResidents());
     }

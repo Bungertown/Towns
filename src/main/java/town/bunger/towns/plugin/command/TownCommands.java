@@ -24,6 +24,7 @@ public final class TownCommands {
         manager.command(new CommandTownCreate());
         manager.command(new CommandTownInfo<>());
         manager.command(new CommandTownList<>());
+        manager.command(new CommandTownOnline());
         manager.command(new CommandTownSetName());
         manager.command(new CommandTownSetSlogan());
     }

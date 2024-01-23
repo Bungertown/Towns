@@ -3,6 +3,7 @@ package town.bunger.towns.api.town;
 import com.google.gson.JsonObject;
 import net.kyori.adventure.audience.ForwardingAudience;
 import org.jspecify.annotations.Nullable;
+import town.bunger.towns.api.resident.Resident;
 import town.bunger.towns.api.resident.ResidentView;
 
 import java.time.LocalDateTime;
@@ -95,4 +96,12 @@ public interface TownView extends ForwardingAudience {
      * @return An asynchronous future returning a collection of all residents in the town
      */
     CompletableFuture<? extends Collection<? extends ResidentView>> residents();
+
+    /**
+     * Whether the town has a {@link Resident} with the given UUID.
+     *
+     * @param uuid The UUID of the resident
+     * @return True if the town has a resident with the given UUID
+     */
+    boolean hasResident(UUID uuid);
 }
