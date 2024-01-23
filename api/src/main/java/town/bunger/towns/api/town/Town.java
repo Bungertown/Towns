@@ -19,6 +19,20 @@ public interface Town extends TownView {
     @Override
     CompletableFuture<? extends Collection<? extends Resident>> residents();
 
+    /**
+     * Sets the name of the town.
+     *
+     * @param name The new name
+     */
+    void setName(String name);
+
+    /**
+     * Sets the slogan of the town.
+     *
+     * @param slogan The new slogan
+     */
+    void setSlogan(@Nullable String slogan);
+
     interface Builder {
 
         /**
@@ -60,6 +74,14 @@ public interface Town extends TownView {
          * @return This builder
          */
         Builder public_(boolean public_);
+
+        /**
+         * Sets the slogan of the town.
+         *
+         * @param slogan The new slogan
+         * @return This builder
+         */
+        Builder slogan(String slogan);
 
         /**
          * Sets extra data stored by addons for the town.

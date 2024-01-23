@@ -61,6 +61,13 @@ public interface TownView {
     boolean isPublic();
 
     /**
+     * Gets the slogan of the town.
+     *
+     * @return The town's slogan, or null if the slogan has not been set
+     */
+    @Nullable String slogan();
+
+    /**
      * Returns extra data stored by addons for the town.
      *
      * @return The extra data

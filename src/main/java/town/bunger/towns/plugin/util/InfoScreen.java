@@ -13,9 +13,10 @@ public final class InfoScreen {
 
     public static List<Component> printTown(final Town town) {
         final Component banner = TextBanner.create(town.name());
+        final String slogan = town.slogan();
         final Component sloganEst = text()
             .append(
-                text("  \"YOUR SLOGAN HERE\"", color(73, 189, 227)) // TODO
+                text("  \"" + (slogan != null ? slogan : "YOUR SLOGAN HERE") + "\"", color(73, 189, 227)) // TODO
                     .hoverEvent(text("The town's slogan, or message of the day.", NamedTextColor.GRAY)),
                 text()
                     .append(

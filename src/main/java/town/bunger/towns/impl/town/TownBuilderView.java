@@ -1,6 +1,7 @@
 package town.bunger.towns.impl.town;
 
 import com.google.gson.JsonObject;
+import org.jspecify.annotations.Nullable;
 import town.bunger.towns.api.resident.ResidentView;
 import town.bunger.towns.api.town.TownView;
 import town.bunger.towns.impl.resident.WrappedResidentView;
@@ -53,6 +54,11 @@ public final class TownBuilderView implements TownView {
     @Override
     public boolean isPublic() {
         return this.builder.public_;
+    }
+
+    @Override
+    public @Nullable String slogan() {
+        return this.builder.slogan;
     }
 
     @Override

@@ -11,11 +11,15 @@ import town.bunger.towns.api.town.Town;
 import town.bunger.towns.impl.BungerTownsImpl;
 import town.bunger.towns.impl.resident.ResidentImpl;
 import town.bunger.towns.impl.resident.WrappedResidentView;
+import town.bunger.towns.plugin.db.Tables;
 import town.bunger.towns.plugin.db.tables.records.TownRecord;
 import town.bunger.towns.plugin.jooq.JsonUtil;
 
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.Collection;
+import java.util.List;
+import java.util.Objects;
+import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentSkipListSet;
 
@@ -23,11 +27,12 @@ public final class TownImpl implements Town {
 
     private final BungerTownsImpl api;
     private final int id;
-    private final String name;
+    private String name;
     private final LocalDateTime created;
     private final UUID ownerId;
     private final boolean open;
     private final boolean public_;
+    private @Nullable String slogan;
     private final JsonObject metadata;
     private final ConcurrentSkipListSet<UUID> residents;
 
@@ -45,6 +50,7 @@ public final class TownImpl implements Town {
         this.ownerId = Objects.requireNonNull(builder.owner, "owner").id();
         this.open = builder.open;
         this.public_ = builder.public_;
+        this.slogan = builder.slogan;
         this.metadata = builder.metadata;
         this.residents = new ConcurrentSkipListSet<>();
         this.residents.add(this.ownerId);
@@ -65,6 +71,7 @@ public final class TownImpl implements Town {
         this.ownerId = record.getOwnerId();
         this.open = record.getOpen();
         this.public_ = record.getPublic();
+        this.slogan = record.getSlogan();
         this.metadata = JsonUtil.fromJooq(record.getMetadata());
         this.residents = new ConcurrentSkipListSet<>(residents);
     }
@@ -82,6 +89,23 @@ public final class TownImpl implements Town {
     @Override
     public String name() {
         return this.name;
+    }
+
+    @Override
+    public void setName(String name) {
+        Objects.requireNonNull(name, "Cannot set town name to null");
+        if (this.api.towns().contains(name)) {
+            throw new IllegalArgumentException("Town with name " + name + " already exists");
+        }
+
+        final String oldName = this.name;
+        this.name = name;
+        this.api.db().ctx()
+            .update(Tables.TOWN)
+            .set(Tables.TOWN.NAME, name)
+            .where(Tables.TOWN.ID.eq(this.id))
+            .executeAsync();
+        this.api.towns().updateName(this.id, oldName, name);
     }
 
     @Override
@@ -112,6 +136,21 @@ public final class TownImpl implements Town {
     @Override
     public boolean isPublic() {
         return this.public_;
+    }
+
+    @Override
+    public @Nullable String slogan() {
+        return this.slogan;
+    }
+
+    @Override
+    public void setSlogan(@Nullable String slogan) {
+        this.slogan = slogan;
+        this.api.db().ctx()
+            .update(Tables.TOWN)
+            .set(Tables.TOWN.SLOGAN, slogan)
+            .where(Tables.TOWN.ID.eq(this.id))
+            .executeAsync();
     }
 
     @Override
@@ -194,6 +233,7 @@ public final class TownImpl implements Town {
         public @Nullable ResidentImpl owner;
         public boolean open;
         public boolean public_;
+        public @Nullable String slogan;
         public JsonObject metadata = new JsonObject();
 
         @Override
@@ -227,6 +267,12 @@ public final class TownImpl implements Town {
         @Override
         public Builder public_(boolean public_) {
             this.public_ = public_;
+            return this;
+        }
+
+        @Override
+        public Builder slogan(String slogan) {
+            this.slogan = slogan;
             return this;
         }
 

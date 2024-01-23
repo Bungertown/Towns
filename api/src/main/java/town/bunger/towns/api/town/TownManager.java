@@ -48,6 +48,14 @@ public interface TownManager {
     CompletableFuture<? extends @Nullable Town> load(String name);
 
     /**
+     * Whether a {@link Town} exists.
+     *
+     * @param name The name of the town
+     * @return True if the town exists
+     */
+    boolean contains(String name);
+
+    /**
      * Creates a town from a builder.
      *
      * @param builder The town creation data

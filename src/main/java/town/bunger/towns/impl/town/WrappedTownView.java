@@ -60,6 +60,11 @@ public final class WrappedTownView implements TownView {
     }
 
     @Override
+    public @Nullable String slogan() {
+        return this.town.slogan();
+    }
+
+    @Override
     public JsonObject metadata() {
         return this.town.metadata().deepCopy();
     }

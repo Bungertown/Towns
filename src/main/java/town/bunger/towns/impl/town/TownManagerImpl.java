@@ -142,6 +142,24 @@ public final class TownManagerImpl implements TownManager {
     }
 
     @Override
+    public boolean contains(String name) {
+        return this.namesToIds.getIfPresent(name) != null;
+    }
+
+    /**
+     * Updates the name cache when a town's name is changed.
+     *
+     * @param id The town's database ID
+     * @param oldName The old name
+     * @param newName The new name
+     */
+    @API(status = API.Status.INTERNAL)
+    public void updateName(int id, String oldName, String newName) {
+        this.namesToIds.invalidate(oldName);
+        this.namesToIds.put(newName, id);
+    }
+
+    @Override
     public CompletableFuture<TownImpl> create(Town.Builder builder) {
         if (!(builder instanceof TownImpl.BuilderImpl data)) {
             return CompletableFuture.failedFuture(new IllegalArgumentException("Invalid builder type"));

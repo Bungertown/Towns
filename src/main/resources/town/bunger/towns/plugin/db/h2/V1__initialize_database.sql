@@ -13,14 +13,14 @@ create table "${tablePrefix}resident"
 create table "${tablePrefix}town"
 (
     "id"          INTEGER auto_increment,
-    "name"        CHARACTER VARYING                  not null
+    "name"        CHARACTER VARYING                          not null
         constraint "town_uk_name"
             unique,
-    "owner_id"    UUID                               not null,
-    "created"     TIMESTAMP default LOCALTIMESTAMP   not null,
-    "open"        BOOLEAN   default FALSE            not null,
-    "public"      BOOLEAN   default FALSE            not null,
-    "metadata"    JSON      default '{}'             not null,
+    "owner_id"    UUID                                       not null,
+    "created"     TIMESTAMP         default LOCALTIMESTAMP   not null,
+    "open"        BOOLEAN           default FALSE            not null,
+    "public"      BOOLEAN           default FALSE            not null,
+    "metadata"    JSON              default '{}'             not null,
     constraint "town_pk"
         primary key ("id"),
     constraint "town_resident_id_fk"
