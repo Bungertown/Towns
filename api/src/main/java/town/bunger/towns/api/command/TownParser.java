@@ -11,7 +11,7 @@ import cloud.commandframework.context.CommandContext;
 import cloud.commandframework.context.CommandInput;
 import cloud.commandframework.exceptions.parsing.ParserException;
 import org.jspecify.annotations.Nullable;
-import town.bunger.towns.api.BungerTownsProvider;
+import town.bunger.towns.api.BungerTowns;
 import town.bunger.towns.api.town.Town;
 
 public final class TownParser<C> implements ArgumentParser<C, Town>, BlockingSuggestionProvider<C> {
@@ -33,6 +33,8 @@ public final class TownParser<C> implements ArgumentParser<C, Town>, BlockingSug
 
     @Override
     public ArgumentParseResult<Town> parse(CommandContext<C> context, CommandInput commandInput) {
+        final BungerTowns api = context.inject(BungerTowns.class).orElseThrow();
+
         String input = commandInput.peekString();
         if (input.isEmpty()) {
             return ArgumentParseResult.failure(new TownParseException(input, context));
@@ -44,7 +46,7 @@ public final class TownParser<C> implements ArgumentParser<C, Town>, BlockingSug
             input = input.substring(this.prefix.length());
         }
 
-        final Town town = BungerTownsProvider.get().towns().get(input);
+        final Town town = api.towns().get(input);
         if (town != null) {
             commandInput.readString();
             return ArgumentParseResult.success(town);
@@ -55,7 +57,9 @@ public final class TownParser<C> implements ArgumentParser<C, Town>, BlockingSug
 
     @Override
     public Iterable<Suggestion> suggestions(CommandContext<C> context, CommandInput input) {
-        return BungerTownsProvider.get().towns().allNames().stream()
+        final BungerTowns api = context.inject(BungerTowns.class).orElseThrow();
+
+        return api.towns().allNames().stream()
             .map(name -> {
                 if (this.prefix == null) {
                     return Suggestion.simple(name);
