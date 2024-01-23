@@ -76,6 +76,11 @@ public final class ResidentImpl implements Resident {
     }
 
     @Override
+    public boolean hasTown() {
+        return this.townId != null;
+    }
+
+    @Override
     public @Nullable TownImpl town() {
         if (this.townId == null) {
             return null;
@@ -89,6 +94,16 @@ public final class ResidentImpl implements Resident {
             return CompletableFuture.completedFuture(null);
         }
         return this.api.towns().load(this.townId);
+    }
+
+    /**
+     * Gets the database ID of the town.
+     *
+     * @return The database ID
+     */
+    @API(status = API.Status.INTERNAL)
+    public @Nullable Integer townId() {
+        return this.townId;
     }
 
     @Override

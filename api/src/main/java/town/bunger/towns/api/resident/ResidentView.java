@@ -40,6 +40,13 @@ public interface ResidentView extends ForwardingAudience.Single {
     @Nullable LocalDateTime lastJoined();
 
     /**
+     * Whether the resident is a member of a town.
+     *
+     * @return True if the resident is a member of a town, even if the town is not loaded
+     */
+    boolean hasTown();
+
+    /**
      * Gets the town the resident is a member of.
      *
      * @return The town, or null if the resident is not a member of a town or the town is not loaded

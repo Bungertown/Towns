@@ -38,7 +38,7 @@ public final class CommandTownCreate extends TownCommandBean<CommandSender> {
             context.sender().sendMessage(text("Your resident data is not loaded.", NamedTextColor.RED));
             return CompletableFuture.completedFuture(null);
         }
-        if (resident.town() != null) {
+        if (resident.hasTown()) {
             context.sender().sendMessage(text("You must leave your current town before creating a new one.", NamedTextColor.RED));
             return CompletableFuture.completedFuture(null);
         }

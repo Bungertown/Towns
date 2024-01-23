@@ -42,6 +42,11 @@ public final class WrappedResidentView implements ResidentView {
     }
 
     @Override
+    public boolean hasTown() {
+        return this.resident.hasTown();
+    }
+
+    @Override
     public @Nullable TownView town() {
         final TownImpl town = this.resident.town();
         if (town == null) {

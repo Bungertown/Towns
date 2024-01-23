@@ -189,11 +189,12 @@ public final class TownImpl implements Town {
      */
     @API(status = API.Status.INTERNAL)
     public boolean addResident(ResidentImpl resident) {
-        if (resident.town() != null) {
+        final Integer id = resident.townId();
+        if (id != null) {
             // Already in a town
             // true  = same town
             // false = different town
-            return resident.town() == this;
+            return id == this.id;
         }
 
         // Let plugins cancel joining a town
@@ -216,7 +217,8 @@ public final class TownImpl implements Town {
      */
     @API(status = API.Status.INTERNAL)
     public boolean removeResident(ResidentImpl resident) {
-        if (resident.town() != this) {
+        final Integer id = resident.townId();
+        if (id == null || id != this.id) {
             // Not in this town
             return false;
         }

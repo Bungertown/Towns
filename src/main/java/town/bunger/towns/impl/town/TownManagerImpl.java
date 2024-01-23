@@ -173,7 +173,7 @@ public final class TownManagerImpl implements TownManager {
 
         // Make sure the owner isn't already in a town
         final ResidentImpl owner = Objects.requireNonNull(data.owner, "owner");
-        if (owner.town() != null) {
+        if (owner.hasTown()) {
             return CompletableFuture.failedFuture(new IllegalArgumentException("Owner is already in a town"));
         }
 
