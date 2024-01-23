@@ -22,7 +22,7 @@ public final class CommandTownCreate extends TownCommandBean<CommandSender> {
     @Override
     protected Command.Builder<CommandSender> configure(Command.Builder<CommandSender> builder) {
         return builder
-            .literal("create")
+            .literal("create", "new")
             .required("name", StringParser.stringParser());
     }
 
