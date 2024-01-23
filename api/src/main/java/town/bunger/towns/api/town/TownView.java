@@ -1,6 +1,7 @@
 package town.bunger.towns.api.town;
 
 import com.google.gson.JsonObject;
+import net.kyori.adventure.audience.ForwardingAudience;
 import org.jspecify.annotations.Nullable;
 import town.bunger.towns.api.resident.ResidentView;
 
@@ -9,7 +10,7 @@ import java.util.Collection;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
-public interface TownView {
+public interface TownView extends ForwardingAudience {
 
     /**
      * Gets the name of the town.

@@ -1,6 +1,8 @@
 package town.bunger.towns.impl.resident;
 
 import com.google.gson.JsonObject;
+import net.kyori.adventure.audience.Audience;
+import org.jetbrains.annotations.NotNull;
 import org.jspecify.annotations.Nullable;
 import town.bunger.towns.api.resident.ResidentView;
 import town.bunger.towns.api.town.TownView;
@@ -67,5 +69,10 @@ public final class WrappedResidentView implements ResidentView {
     @Override
     public JsonObject metadata() {
         return this.resident.metadata().deepCopy();
+    }
+
+    @Override
+    public @NotNull Audience audience() {
+        return this.resident.audience();
     }
 }

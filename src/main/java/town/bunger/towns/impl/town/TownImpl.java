@@ -1,8 +1,10 @@
 package town.bunger.towns.impl.town;
 
 import com.google.gson.JsonObject;
+import net.kyori.adventure.audience.Audience;
 import org.apiguardian.api.API;
 import org.bukkit.Bukkit;
+import org.jetbrains.annotations.NotNull;
 import org.jspecify.annotations.Nullable;
 import town.bunger.towns.api.event.resident.JoinTownResidentEvent;
 import town.bunger.towns.api.event.resident.LeaveTownResidentEvent;
@@ -224,6 +226,11 @@ public final class TownImpl implements Town {
         resident.setTown(null);
         this.residents.remove(resident.id());
         return true;
+    }
+
+    @Override
+    public @NotNull Iterable<? extends Audience> audiences() {
+        return List.copyOf(this.loadedResidents());
     }
 
     public static final class BuilderImpl implements Town.Builder {

@@ -1,6 +1,7 @@
 package town.bunger.towns.api.resident;
 
 import com.google.gson.JsonObject;
+import net.kyori.adventure.audience.ForwardingAudience;
 import org.jspecify.annotations.Nullable;
 import town.bunger.towns.api.town.TownView;
 
@@ -8,7 +9,7 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
-public interface ResidentView {
+public interface ResidentView extends ForwardingAudience.Single {
 
     /**
      * Gets the UUID of the resident.

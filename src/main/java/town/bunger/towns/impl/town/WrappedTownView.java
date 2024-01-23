@@ -1,6 +1,8 @@
 package town.bunger.towns.impl.town;
 
 import com.google.gson.JsonObject;
+import net.kyori.adventure.audience.Audience;
+import org.jetbrains.annotations.NotNull;
 import org.jspecify.annotations.Nullable;
 import town.bunger.towns.api.resident.ResidentView;
 import town.bunger.towns.api.town.TownView;
@@ -82,5 +84,10 @@ public final class WrappedTownView implements TownView {
     @Override
     public CompletableFuture<? extends Collection<? extends ResidentView>> residents() {
         return this.town.residents().thenApply(residents -> residents.stream().map(WrappedResidentView::new).toList());
+    }
+
+    @Override
+    public @NotNull Iterable<? extends Audience> audiences() {
+        return this.town.audiences();
     }
 }

@@ -1,7 +1,11 @@
 package town.bunger.towns.impl.resident;
 
 import com.google.gson.JsonObject;
+import net.kyori.adventure.audience.Audience;
 import org.apiguardian.api.API;
+import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 import org.jspecify.annotations.Nullable;
 import town.bunger.towns.api.resident.Resident;
 import town.bunger.towns.api.town.Town;
@@ -147,5 +151,11 @@ public final class ResidentImpl implements Resident {
     @Override
     public JsonObject metadata() {
         return this.metadata;
+    }
+
+    @Override
+    public @NotNull Audience audience() {
+        final Player player = Bukkit.getPlayer(this.uuid);
+        return Objects.requireNonNullElseGet(player, Audience::empty);
     }
 }
