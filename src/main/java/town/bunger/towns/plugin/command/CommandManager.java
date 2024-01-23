@@ -16,8 +16,8 @@ public class CommandManager {
         this.manager.registerAsynchronousCompletions();
     }
 
-    public void register(BungerTownsPlugin plugin, BungerTownsImpl api) {
+    public void register(BungerTownsImpl api) {
         ResidentCommands.register(this.manager, api);
-        TownCommands.register(this.manager, plugin, api);
+        TownCommands.register(this.manager, api);
     }
 }

@@ -14,6 +14,7 @@ import town.bunger.towns.impl.BungerTownsImpl;
 import town.bunger.towns.impl.resident.ResidentImpl;
 import town.bunger.towns.plugin.db.Tables;
 import town.bunger.towns.plugin.db.tables.records.TownRecord;
+import town.bunger.towns.plugin.util.MainThreadExecutor;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
@@ -64,13 +65,20 @@ public final class TownManagerImpl implements TownManager {
     }
 
     @Override
-    public Collection<String> all() {
+    public Collection<String> allNames() {
         return List.copyOf(this.namesToIds.asMap().keySet());
     }
 
     @Override
     public Collection<TownImpl> loaded() {
         return List.copyOf(this.cache.synchronous().asMap().values());
+    }
+
+    @Override
+    public CompletableFuture<? extends Collection<TownImpl>> all() {
+        return this.cache
+            .getAll(this.namesToIds.asMap().values())
+            .thenApply(towns -> List.copyOf(towns.values()));
     }
 
     /**
@@ -151,18 +159,20 @@ public final class TownManagerImpl implements TownManager {
             return CompletableFuture.failedFuture(new IllegalArgumentException("Owner is already in a town"));
         }
 
-        // Let other plugins cancel town creation
-        var createEvent = new CreateTownEvent(new TownBuilderView(data), owner);
-        Bukkit.getPluginManager().callEvent(createEvent);
-        if (createEvent.isCancelled()) {
-            return CompletableFuture.failedFuture(new IllegalStateException("Town creation was cancelled"));
-        }
-
-        return this.api.db().ctx()
-            .insertInto(Tables.TOWN)
-            .set(data.toRecord())
-            .returningResult(Tables.TOWN.ID)
-            .fetchAsync()
+        return CompletableFuture
+            .runAsync(() -> {
+                // Let other plugins cancel town creation
+                var createEvent = new CreateTownEvent(new TownBuilderView(data), owner);
+                Bukkit.getPluginManager().callEvent(createEvent);
+                if (createEvent.isCancelled()) {
+                    throw new IllegalStateException("Town creation was cancelled");
+                }
+            }, MainThreadExecutor.INSTANCE)
+            .thenCompose($ -> this.api.db().ctx()
+                .insertInto(Tables.TOWN)
+                .set(data.toRecord())
+                .returningResult(Tables.TOWN.ID)
+                .fetchAsync())
             .thenApply(result -> {
                 if (result.isEmpty()) {
                     throw new IllegalStateException("Failed to insert town " + name);

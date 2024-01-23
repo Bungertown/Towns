@@ -4,5 +4,5 @@ import java.time.format.DateTimeFormatter;
 
 public final class DateFormats {
 
-    public static DateTimeFormatter DATE = DateTimeFormatter.ofPattern("MMM dd yyyy");
+    public static final DateTimeFormatter DATE = DateTimeFormatter.ofPattern("MMM dd yyyy");
 }

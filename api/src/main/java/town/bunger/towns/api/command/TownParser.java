@@ -55,7 +55,7 @@ public final class TownParser<C> implements ArgumentParser<C, Town>, BlockingSug
 
     @Override
     public Iterable<Suggestion> suggestions(CommandContext<C> context, CommandInput input) {
-        return BungerTownsProvider.get().towns().all().stream()
+        return BungerTownsProvider.get().towns().allNames().stream()
             .map(name -> {
                 if (this.prefix == null) {
                     return Suggestion.simple(name);

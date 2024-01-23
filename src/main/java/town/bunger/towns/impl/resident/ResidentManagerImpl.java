@@ -65,7 +65,27 @@ public final class ResidentManagerImpl implements ResidentManager {
      */
     @API(status = API.Status.INTERNAL)
     public void setName(UUID uuid, String name) {
+        final String currentName = this.uuidsToNames.getIfPresent(uuid);
+        if (currentName != null && currentName.equals(name)) {
+            // No change
+            return;
+        }
+
         this.uuidsToNames.put(uuid, name);
+        if (currentName != null) {
+            // If the resident was already registered but with a different name, update the database
+            // Residents that are yet to be registered will be inserted when they are first loaded
+            this.api.db().ctx()
+                .update(Tables.RESIDENT)
+                .set(Tables.RESIDENT.NAME, name)
+                .where(Tables.RESIDENT.ID.eq(uuid))
+                .executeAsync()
+                .whenComplete((result, ex) -> {
+                    if (ex != null) {
+                        this.api.logger().error("Failed to update resident name in database", ex);
+                    }
+                });
+        }
     }
 
     @Override

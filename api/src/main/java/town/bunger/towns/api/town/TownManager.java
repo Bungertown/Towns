@@ -15,7 +15,7 @@ public interface TownManager {
      *
      * @return All town names
      */
-    Collection<String> all();
+    Collection<String> allNames();
 
     /**
      * Gets a collection of all loaded towns.
@@ -23,6 +23,13 @@ public interface TownManager {
      * @return All loaded towns
      */
     Collection<? extends Town> loaded();
+
+    /**
+     * Gets a collection of all towns.
+     *
+     * @return An asynchronous future returning all towns
+     */
+    CompletableFuture<? extends Collection<? extends Town>> all();
 
     /**
      * Gets a town by name.

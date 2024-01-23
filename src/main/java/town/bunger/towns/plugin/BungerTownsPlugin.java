@@ -2,6 +2,7 @@ package town.bunger.towns.plugin;
 
 import org.bukkit.plugin.ServicePriority;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.jspecify.annotations.Nullable;
 import town.bunger.towns.api.BungerTowns;
 import town.bunger.towns.api.BungerTownsProvider;
 import town.bunger.towns.impl.BungerTownsImpl;
@@ -12,11 +13,20 @@ import town.bunger.towns.plugin.listener.ResidentListener;
 
 import java.io.IOException;
 import java.nio.file.Files;
+import java.util.Objects;
 
 public final class BungerTownsPlugin extends JavaPlugin {
 
+    private static @Nullable BungerTownsPlugin instance = null;
+
+    public static BungerTownsPlugin getInstance() {
+        return Objects.requireNonNull(instance, "BungerTowns is not enabled");
+    }
+
     @Override
     public void onEnable() {
+        instance = this;
+
         if (!Files.exists(this.getDataFolder().toPath())) {
             try {
                 Files.createDirectories(this.getDataFolder().toPath());
@@ -45,7 +55,7 @@ public final class BungerTownsPlugin extends JavaPlugin {
         BungerTownsProvider.register(api);
 
         var commands = new CommandManager(this);
-        commands.register(this, api);
+        commands.register(api);
 
         this.getServer().getPluginManager().registerEvents(new ResidentListener(api), this);
     }

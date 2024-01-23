@@ -15,6 +15,7 @@ public record ResidentListener(BungerTownsImpl api) implements Listener {
      */
     @EventHandler(priority = EventPriority.LOWEST)
     public void prefetchOnLogin(AsyncPlayerPreLoginEvent event) {
+        // TODO: some way to bulk pre-fetch residents?
         // Ensure the resident is loaded into the name cache
         this.api.residents().setName(event.getUniqueId(), event.getName());
         // Pre-fetch the resident data
