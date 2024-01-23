@@ -7,6 +7,7 @@ import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import town.bunger.towns.impl.BungerTownsImpl;
+import town.bunger.towns.impl.resident.ResidentImpl;
 
 public record ResidentListener(BungerTownsImpl api) implements Listener {
 
@@ -18,16 +19,16 @@ public record ResidentListener(BungerTownsImpl api) implements Listener {
         // TODO: some way to bulk pre-fetch residents?
         // Ensure the resident is loaded into the name cache
         this.api.residents().setName(event.getUniqueId(), event.getName());
-        // Pre-fetch the resident data
+        // Pre-fetch the resident and resident's town data
         this.api.residents().load(event.getUniqueId())
+            .thenCompose(ResidentImpl::loadTown)
             .whenComplete((resident, ex) -> {
                 if (ex != null) {
                     this.api.logger().error("Failed to load resident for player " + event.getName(), ex);
                     return;
                 }
-                this.api.logger().debug("Loaded resident for player {}", event.getName());
+                this.api.logger().debug("Loaded resident and town for player {}", event.getName());
             });
-        // TODO: consider pre-fetching the town data too
     }
 
     /**
