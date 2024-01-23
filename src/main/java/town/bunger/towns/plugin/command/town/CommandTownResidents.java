@@ -2,29 +2,31 @@ package town.bunger.towns.plugin.command.town;
 
 import cloud.commandframework.Command;
 import cloud.commandframework.context.CommandContext;
-import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import org.checkerframework.checker.nullness.qual.NonNull;
+import org.bukkit.command.CommandSender;
 import town.bunger.towns.api.command.TownParser;
 import town.bunger.towns.api.town.Town;
 import town.bunger.towns.plugin.command.TownCommandBean;
-import town.bunger.towns.plugin.util.InfoScreen;
-
-import java.util.List;
+import town.bunger.towns.plugin.util.TextBanner;
 
 import static net.kyori.adventure.text.Component.text;
 
-public final class CommandTownInfo<C extends Audience> extends TownCommandBean<C> {
+public final class CommandTownResidents extends TownCommandBean<CommandSender> {
+
+    public static final Component BANNER = TextBanner.create("All Residents");
 
     @Override
-    protected Command.Builder<C> configure(Command.Builder<C> builder) {
-        return builder.literal("info", "i")
+    protected Command.Builder<CommandSender> configure(Command.Builder<CommandSender> builder) {
+        return builder
+            .literal("residents")
             .optional("town", TownParser.of());
     }
 
     @Override
-    public void execute(@NonNull CommandContext<C> context) {
+    public void execute(
+        CommandContext<CommandSender> context
+    ) {
         final Town town = context.<Town>optional("town")
             .or(() -> context.inject(Town.class))
             .orElse(null);
@@ -33,9 +35,9 @@ public final class CommandTownInfo<C extends Audience> extends TownCommandBean<C
             return;
         }
 
-        final List<Component> components = InfoScreen.printTown(town);
-        for (final Component component : components) {
-            context.sender().sendMessage(component);
+        context.sender().sendMessage(BANNER);
+        for (String name : town.residentNames()) {
+            context.sender().sendMessage(text("  " + name, NamedTextColor.GREEN));
         }
     }
 }

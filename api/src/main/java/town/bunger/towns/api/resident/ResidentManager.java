@@ -48,9 +48,17 @@ public interface ResidentManager {
      * Gets a collection of loaded residents by UUIDs.
      *
      * @param uuids The UUIDs of the residents
-     * @return A map of UUIDs to residents
+     * @return An unmodifiable map of UUIDs to residents
      */
     Map<UUID, ? extends Resident> getAll(Collection<UUID> uuids);
+
+    /**
+     * Gets a collection of resident names by UUIDs.
+     *
+     * @param uuids The UUIDs of the residents
+     * @return An unmodifiable map of UUIDs to resident names
+     */
+    Map<UUID, String> getAllNames(Collection<UUID> uuids);
 
     /**
      * Loads a resident by UUID. If the resident does not exist, it will be created.

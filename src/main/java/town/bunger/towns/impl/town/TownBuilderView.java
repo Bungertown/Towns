@@ -74,6 +74,11 @@ public final class TownBuilderView implements TownView {
     }
 
     @Override
+    public Collection<String> residentNames() {
+        return List.of(this.owner().name());
+    }
+
+    @Override
     public Collection<? extends ResidentView> loadedResidents() {
         return List.of(this.owner());
     }

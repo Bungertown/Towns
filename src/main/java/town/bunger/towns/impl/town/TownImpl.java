@@ -166,8 +166,13 @@ public final class TownImpl implements Town {
     }
 
     @Override
+    public Collection<String> residentNames() {
+        return this.api.residents().getAllNames(this.residents).values();
+    }
+
+    @Override
     public Collection<ResidentImpl> loadedResidents() {
-        return List.copyOf(this.api.residents().getAll(this.residents).values());
+        return this.api.residents().getAll(this.residents).values();
     }
 
     @Override

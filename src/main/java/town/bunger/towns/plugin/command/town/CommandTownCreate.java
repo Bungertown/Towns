@@ -12,7 +12,6 @@ import town.bunger.towns.api.resident.Resident;
 import town.bunger.towns.api.town.Town;
 import town.bunger.towns.plugin.command.TownCommandBean;
 
-import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
 import static net.kyori.adventure.text.Component.text;
@@ -34,12 +33,11 @@ public final class CommandTownCreate extends TownCommandBean<CommandSender> {
         final BungerTowns api = context.inject(BungerTowns.class).orElseThrow();
         final Logger logger = context.inject(Logger.class).orElseThrow();
 
-        final Optional<Resident> residentOpt = context.inject(Resident.class);
-        if (residentOpt.isEmpty()) {
+        final Resident resident = context.inject(Resident.class).orElse(null);
+        if (resident == null) {
             context.sender().sendMessage(text("Your resident data is not loaded.", NamedTextColor.RED));
             return CompletableFuture.completedFuture(null);
         }
-        final Resident resident = residentOpt.get();
         if (resident.town() != null) {
             context.sender().sendMessage(text("You must leave your current town before creating a new one.", NamedTextColor.RED));
             return CompletableFuture.completedFuture(null);

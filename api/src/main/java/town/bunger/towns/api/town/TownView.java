@@ -84,6 +84,13 @@ public interface TownView extends ForwardingAudience {
     Collection<UUID> residentIds();
 
     /**
+     * Gets a collection of all names of residents in the town.
+     *
+     * @return All resident names
+     */
+    Collection<String> residentNames();
+
+    /**
      * Gets a collection of all loaded residents in the town.
      *
      * @return All loaded residents

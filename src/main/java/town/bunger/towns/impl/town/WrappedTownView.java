@@ -77,6 +77,11 @@ public final class WrappedTownView implements TownView {
     }
 
     @Override
+    public Collection<String> residentNames() {
+        return this.town.residentNames();
+    }
+
+    @Override
     public Collection<? extends ResidentView> loadedResidents() {
         return this.town.loadedResidents().stream().map(WrappedResidentView::new).toList();
     }

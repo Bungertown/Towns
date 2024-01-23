@@ -114,6 +114,11 @@ public final class ResidentManagerImpl implements ResidentManager {
     }
 
     @Override
+    public Map<UUID, String> getAllNames(Collection<UUID> uuids) {
+        return this.uuidsToNames.getAllPresent(uuids);
+    }
+
+    @Override
     public CompletableFuture<ResidentImpl> load(UUID uuid) {
         if (this.uuidsToNames.getIfPresent(uuid) == null) {
             return CompletableFuture.completedFuture(null);
