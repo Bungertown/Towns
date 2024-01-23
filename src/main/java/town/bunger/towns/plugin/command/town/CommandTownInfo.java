@@ -16,7 +16,7 @@ public final class CommandTownInfo<C extends Audience> extends TownCommandBean<C
 
     @Override
     protected Command.Builder<C> configure(Command.Builder<C> builder) {
-        return builder.literal("info")
+        return builder.literal("info", "i")
             .required("town", TownParser.of());
     }
 
