@@ -4,7 +4,6 @@ import org.bukkit.plugin.ServicePriority;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jspecify.annotations.Nullable;
 import town.bunger.towns.api.BungerTowns;
-import town.bunger.towns.api.BungerTownsProvider;
 import town.bunger.towns.impl.BungerTownsImpl;
 import town.bunger.towns.plugin.command.CommandManager;
 import town.bunger.towns.plugin.config.ConfigManager;
@@ -52,7 +51,6 @@ public final class BungerTownsPlugin extends JavaPlugin {
         var api = new BungerTownsImpl(this.getSLF4JLogger(), config, database);
         api.loadAllIds();
         this.getServer().getServicesManager().register(BungerTowns.class, api, this, ServicePriority.High);
-        BungerTownsProvider.register(api);
 
         var commands = new CommandManager(this);
         commands.register(api);
