@@ -27,9 +27,7 @@ dependencies {
     // JSON support
     api("com.google.code.gson:gson:2.10.1")
     // Command framework
-    // TODO: NoClassDefFoundError: cloud.commandframework.types.range.Range
-//    api("cloud.commandframework:cloud-core:2.0.0-SNAPSHOT")
-    api("cloud.commandframework:cloud-core:2.0.0-20240120.200824-18")
+    api("org.incendo:cloud-core:2.0.0-beta.2")
     // Annotations
     compileOnly("org.apiguardian:apiguardian-api:1.1.2")
     compileOnly("org.jspecify:jspecify:0.3.0")

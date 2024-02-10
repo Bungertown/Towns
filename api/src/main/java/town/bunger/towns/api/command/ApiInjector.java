@@ -1,9 +1,9 @@
 package town.bunger.towns.api.command;
 
-import cloud.commandframework.annotations.injection.InjectionRequest;
-import cloud.commandframework.annotations.injection.InjectionService;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
+import org.incendo.cloud.injection.InjectionRequest;
+import org.incendo.cloud.injection.InjectionService;
 import town.bunger.towns.api.BungerTowns;
 import town.bunger.towns.api.resident.ResidentManager;
 import town.bunger.towns.api.town.TownManager;

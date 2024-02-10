@@ -32,10 +32,9 @@ dependencies {
     // Paper
     compileOnly("io.papermc.paper:paper-api:1.20-R0.1-SNAPSHOT")
     // Command framework
-
-    implementation("cloud.commandframework:cloud-paper:2.0.0-SNAPSHOT")
-    implementation("cloud.commandframework:cloud-annotations:2.0.0-SNAPSHOT")
-    implementation("cloud.commandframework:cloud-minecraft-extras:2.0.0-SNAPSHOT")
+    implementation("org.incendo:cloud-paper:2.0.0-beta.2")
+    implementation("org.incendo:cloud-annotations:2.0.0-beta.2")
+    implementation("org.incendo:cloud-minecraft-extras:2.0.0-beta.2")
     // SQL
     implementation("com.zaxxer:HikariCP:5.1.0")
     implementation("org.jooq:jooq:3.19.2")

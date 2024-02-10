@@ -1,7 +1,7 @@
 package town.bunger.towns.plugin.command.town;
 
-import cloud.commandframework.Command;
-import cloud.commandframework.context.CommandContext;
+import org.incendo.cloud.Command;
+import org.incendo.cloud.context.CommandContext;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Bukkit;

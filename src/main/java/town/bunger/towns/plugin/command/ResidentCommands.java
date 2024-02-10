@@ -1,6 +1,6 @@
 package town.bunger.towns.plugin.command;
 
-import cloud.commandframework.paper.PaperCommandManager;
+import org.incendo.cloud.paper.PaperCommandManager;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.command.CommandSender;

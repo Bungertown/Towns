@@ -1,6 +1,6 @@
 package town.bunger.towns.plugin.command;
 
-import cloud.commandframework.paper.PaperCommandManager;
+import org.incendo.cloud.paper.PaperCommandManager;
 import org.bukkit.command.CommandSender;
 import org.slf4j.Logger;
 import town.bunger.towns.api.command.ApiInjector;

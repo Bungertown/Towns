@@ -1,8 +1,8 @@
 package town.bunger.towns.plugin.command;
 
-import cloud.commandframework.execution.ExecutionCoordinator;
-import cloud.commandframework.paper.PaperCommandManager;
 import org.bukkit.command.CommandSender;
+import org.incendo.cloud.execution.ExecutionCoordinator;
+import org.incendo.cloud.paper.PaperCommandManager;
 import town.bunger.towns.impl.BungerTownsImpl;
 import town.bunger.towns.plugin.BungerTownsPlugin;
 

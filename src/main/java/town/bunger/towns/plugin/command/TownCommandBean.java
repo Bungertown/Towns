@@ -1,8 +1,8 @@
 package town.bunger.towns.plugin.command;
 
-import cloud.commandframework.CommandBean;
-import cloud.commandframework.CommandProperties;
 import org.checkerframework.checker.nullness.qual.NonNull;
+import org.incendo.cloud.bean.CommandBean;
+import org.incendo.cloud.bean.CommandProperties;
 
 public abstract class TownCommandBean<C> extends CommandBean<C> {
 

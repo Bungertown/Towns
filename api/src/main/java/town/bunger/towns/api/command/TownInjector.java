@@ -1,8 +1,8 @@
 package town.bunger.towns.api.command;
 
-import cloud.commandframework.annotations.AnnotationAccessor;
-import cloud.commandframework.annotations.injection.ParameterInjector;
-import cloud.commandframework.context.CommandContext;
+import org.incendo.cloud.context.CommandContext;
+import org.incendo.cloud.injection.ParameterInjector;
+import org.incendo.cloud.util.annotation.AnnotationAccessor;
 import org.jspecify.annotations.Nullable;
 import town.bunger.towns.api.resident.Resident;
 import town.bunger.towns.api.town.Town;

@@ -1,8 +1,8 @@
 package town.bunger.towns.plugin.command;
 
-import cloud.commandframework.annotations.AnnotationAccessor;
-import cloud.commandframework.annotations.injection.ParameterInjector;
-import cloud.commandframework.context.CommandContext;
+import org.incendo.cloud.context.CommandContext;
+import org.incendo.cloud.injection.ParameterInjector;
+import org.incendo.cloud.util.annotation.AnnotationAccessor;
 import org.slf4j.Logger;
 
 public final class LoggerInjector<C> implements ParameterInjector<C, Logger> {
