@@ -31,12 +31,12 @@ public final class TownImpl implements Town {
 
     private final BungerTownsImpl api;
     private final int id;
-    private String name;
+    private volatile String name;
     private final LocalDateTime created;
     private final UUID ownerId;
     private volatile boolean open;
     private final boolean public_;
-    private @Nullable String slogan;
+    private volatile @Nullable String slogan;
     private final JsonObject metadata;
     private final ConcurrentSkipListSet<UUID> residents;
 
@@ -96,20 +96,26 @@ public final class TownImpl implements Town {
     }
 
     @Override
-    public void setName(String name) {
+    public CompletableFuture<@Nullable Void> setName(String name) {
         Objects.requireNonNull(name, "Cannot set town name to null");
         if (this.api.towns().contains(name)) {
             throw new IllegalArgumentException("Town with name " + name + " already exists");
         }
 
         final String oldName = this.name;
-        this.name = name;
-        this.api.db().ctx()
+        return this.api.db().ctx()
             .update(Tables.TOWN)
             .set(Tables.TOWN.NAME, name)
             .where(Tables.TOWN.ID.eq(this.id))
-            .executeAsync();
-        this.api.towns().updateName(this.id, oldName, name);
+            .executeAsync()
+            .thenAccept(rows -> {
+                if (rows != 1) {
+                    throw new IllegalStateException("Failed to update town name");
+                }
+                this.api.towns().updateName(this.id, oldName, name);
+                this.name = name;
+            })
+            .toCompletableFuture();
     }
 
     @Override
@@ -164,13 +170,19 @@ public final class TownImpl implements Town {
     }
 
     @Override
-    public void setSlogan(@Nullable String slogan) {
-        this.slogan = slogan;
-        this.api.db().ctx()
+    public CompletableFuture<@Nullable Void> setSlogan(@Nullable String slogan) {
+        return this.api.db().ctx()
             .update(Tables.TOWN)
             .set(Tables.TOWN.SLOGAN, slogan)
             .where(Tables.TOWN.ID.eq(this.id))
-            .executeAsync();
+            .executeAsync()
+            .thenAccept(rows -> {
+                if (rows != 1) {
+                    throw new IllegalStateException("Failed to update town slogan");
+                }
+                this.slogan = slogan;
+            })
+            .toCompletableFuture();
     }
 
     @Override
@@ -274,13 +286,13 @@ public final class TownImpl implements Town {
         CompletableFuture<Boolean> cancelledFuture = MainThreadExecutor.callEventAsync(leaveEvent);
 
         return cancelledFuture.thenCompose(cancelled -> {
-                if (cancelled) {
-                    return CompletableFuture.completedFuture(false);
-                }
-                return resident.setTown(null)
-                    .thenApply($ -> this.residents.remove(resident.id()))
-                    .exceptionally($ -> false);
-            });
+            if (cancelled) {
+                return CompletableFuture.completedFuture(false);
+            }
+            return resident.setTown(null)
+                .thenApply($ -> this.residents.remove(resident.id()))
+                .exceptionally($ -> false);
+        });
     }
 
     @Override
@@ -295,18 +307,18 @@ public final class TownImpl implements Town {
         CompletableFuture<Boolean> cancelledFuture = MainThreadExecutor.callEventAsync(deleteEvent);
 
         return cancelledFuture.thenCompose(cancelled -> {
-                if (cancelled) {
-                    return CompletableFuture.completedFuture(false);
-                }
-                // Remove all residents from the town
-                var removeResidentsFuture = CompletableFuture.allOf(
-                    this.loadedResidents().stream()
-                        .map(resident -> resident.setTown(null))
-                        .toArray(CompletableFuture[]::new)
-                );
-                // Then delete the town
-                return removeResidentsFuture.thenCompose($ -> this.api.towns().delete(this));
-            });
+            if (cancelled) {
+                return CompletableFuture.completedFuture(false);
+            }
+            // Remove all residents from the town
+            var removeResidentsFuture = CompletableFuture.allOf(
+                this.loadedResidents().stream()
+                    .map(resident -> resident.setTown(null))
+                    .toArray(CompletableFuture[]::new)
+            );
+            // Then delete the town
+            return removeResidentsFuture.thenCompose($ -> this.api.towns().delete(this));
+        });
     }
 
     @Override

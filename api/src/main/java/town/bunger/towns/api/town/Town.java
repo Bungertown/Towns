@@ -18,7 +18,7 @@ public interface Town extends TownView {
      *
      * @param name The new name
      */
-    void setName(String name);
+    CompletableFuture<@Nullable Void> setName(String name);
 
     @Override
     @Nullable Resident owner();
@@ -35,7 +35,7 @@ public interface Town extends TownView {
      *
      * @param slogan The new slogan
      */
-    void setSlogan(@Nullable String slogan);
+    CompletableFuture<@Nullable Void> setSlogan(@Nullable String slogan);
 
     @Override
     CompletableFuture<? extends Collection<? extends Resident>> residents();

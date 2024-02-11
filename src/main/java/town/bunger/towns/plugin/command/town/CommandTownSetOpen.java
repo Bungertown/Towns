@@ -35,12 +35,12 @@ public final class CommandTownSetOpen extends TownCommandBean<CommandSender> {
 
         final boolean open = openArg.toBooleanOrElse(!town.isOpen());
         return town.setOpen(open)
-            .thenAccept($ -> {
-                context.sender().sendMessage(text("Set open status to " + open, NamedTextColor.GREEN));
-            })
-            .exceptionally($ -> {
-                context.sender().sendMessage(text("Failed to set open status", NamedTextColor.RED));
-                return null;
+            .whenComplete(($, ex) -> {
+                if (ex != null) {
+                    context.sender().sendMessage(text("Failed to set open status", NamedTextColor.RED));
+                } else {
+                    context.sender().sendMessage(text("Set open status to " + open, NamedTextColor.GREEN));
+                }
             });
     }
 }
