@@ -1,15 +1,56 @@
 package town.bunger.towns.plugin.util;
 
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
+import town.bunger.towns.api.resident.Resident;
 import town.bunger.towns.api.town.Town;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static net.kyori.adventure.text.Component.text;
 import static net.kyori.adventure.text.format.TextColor.color;
 
 public final class InfoScreen {
+
+    public static List<Component> printResident(final Resident resident) {
+        final Component banner = TextBanner.create(resident.name());
+        final Component uuid = text()
+            .append(
+                text("  UUID: ", NamedTextColor.DARK_GREEN),
+                text(resident.id().toString(), NamedTextColor.GREEN)
+            )
+            .hoverEvent(text("This is the player's 'UUID', or Universally Unique Identifier. " +
+                "It's used to identify the player across name changes.", NamedTextColor.GRAY))
+            .build();
+        final LocalDateTime lastJoined = resident.lastJoined();
+        final Component dates = text().append(
+            text()
+                .append(
+                    text("  Registered: ", NamedTextColor.DARK_GREEN),
+                    text(resident.created().format(DateFormats.DATE), NamedTextColor.GREEN)
+                )
+                .hoverEvent(text("The player was first registered in the town system on this date.", NamedTextColor.GRAY)),
+            text()
+                .append(
+                    text(" Last Joined: ", NamedTextColor.DARK_GREEN),
+                    text(lastJoined != null ? lastJoined.format(DateFormats.DATE) : "*Never*", NamedTextColor.GREEN)
+                )
+                .hoverEvent(text("The player last joined the server on this date.", NamedTextColor.GRAY))
+        ).build();
+        final String townName = resident.townName();
+        final Component town = text()
+            .append(
+                text("  Town: ", NamedTextColor.DARK_GREEN),
+                text(townName != null ? townName : "*none*", NamedTextColor.GREEN)
+            )
+            .hoverEvent(text("The town the player is a member of." + (townName != null ? "\n\nClick to view their town." : ""), NamedTextColor.GRAY))
+            .clickEvent(townName != null ? ClickEvent.runCommand("/town info " + townName) : null)
+            .build();
+
+        return List.of(banner, uuid, dates, town);
+    }
 
     public static List<Component> printTown(final Town town) {
         final Component banner = TextBanner.create(town.name());
