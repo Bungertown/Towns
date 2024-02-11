@@ -20,6 +20,13 @@ public interface ResidentManager {
     Collection<UUID> all();
 
     /**
+     * Gets a collection of all {@link Resident} names, loaded or not.
+     *
+     * @return All resident names
+     */
+    Collection<String> allNames();
+
+    /**
      * Gets a collection of all loaded {@link Resident}s.
      *
      * @return All loaded residents
@@ -35,6 +42,14 @@ public interface ResidentManager {
     @Nullable Resident get(UUID uuid);
 
     /**
+     * Gets a loaded {@link Resident} by name.
+     *
+     * @param name The name of the resident
+     * @return The resident, or null if it doesn't exist or isn't loaded
+     */
+    @Nullable Resident get(String name);
+
+    /**
      * Gets a resident's name by UUID.
      *
      * <p>Even if the resident is not loaded, this will still return their name.</p>
@@ -43,6 +58,14 @@ public interface ResidentManager {
      * @return The resident's name, or null if it doesn't exist
      */
     @Nullable String getName(UUID uuid);
+
+    /**
+     * Gets a resident's UUID by name.
+     *
+     * @param name The name of the resident
+     * @return The resident's UUID, or null if it doesn't exist
+     */
+    @Nullable UUID getUUID(String name);
 
     /**
      * Gets a collection of loaded residents by UUIDs.
@@ -66,7 +89,15 @@ public interface ResidentManager {
      * @param uuid The UUID of the resident
      * @return An asynchronous future returning the resident, or null if it doesn't exist
      */
-    CompletableFuture<? extends Resident> load(UUID uuid);
+    CompletableFuture<? extends Resident> loadOrCreatePlayer(UUID uuid);
+
+    /**
+     * Attempts to load a player {@link Resident} by name.
+     *
+     * @param name The name of the resident
+     * @return An asynchronous future returning the resident, or null if it doesn't exist
+     */
+    CompletableFuture<? extends @Nullable Resident> loadPlayer(String name);
 
     /**
      * Loads a collection of residents by UUID.
@@ -74,5 +105,5 @@ public interface ResidentManager {
      * @param uuids The UUIDs of the residents
      * @return An asynchronous future returning a map of UUIDs to residents
      */
-    CompletableFuture<? extends Map<UUID, ? extends Resident>> loadAll(Collection<UUID> uuids);
+    CompletableFuture<? extends Map<UUID, ? extends Resident>> loadOrCreatePlayers(Collection<UUID> uuids);
 }

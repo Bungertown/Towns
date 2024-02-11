@@ -20,7 +20,7 @@ public record ResidentListener(BungerTownsImpl api) implements Listener {
         // Ensure the resident is loaded into the name cache
         this.api.residents().setName(event.getUniqueId(), event.getName());
         // Pre-fetch the resident and resident's town data
-        this.api.residents().load(event.getUniqueId())
+        this.api.residents().loadOrCreatePlayer(event.getUniqueId())
             .thenCompose(ResidentImpl::loadTown)
             .whenComplete((resident, ex) -> {
                 if (ex != null) {
@@ -36,7 +36,7 @@ public record ResidentListener(BungerTownsImpl api) implements Listener {
      */
     @EventHandler(priority = EventPriority.MONITOR)
     public void setOnlineOnJoin(PlayerJoinEvent event) {
-        final var future = this.api.residents().load(event.getPlayer().getUniqueId());
+        final var future = this.api.residents().loadOrCreatePlayer(event.getPlayer().getUniqueId());
         future.whenComplete((resident, ex) -> {
             if (ex == null) {
                 resident.online = true;

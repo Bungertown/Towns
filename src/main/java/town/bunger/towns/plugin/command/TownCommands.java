@@ -13,7 +13,6 @@ import town.bunger.towns.plugin.command.town.*;
 
 public final class TownCommands {
 
-
     public static void register(PaperCommandManager<CommandSender> manager, BungerTownsImpl api) {
         manager.parameterInjectorRegistry()
             .registerInjectionService(new ApiInjector<>(api));
@@ -26,11 +25,16 @@ public final class TownCommands {
 
         manager.command(new CommandTown<>());
         manager.command(new CommandTownCreate());
+        manager.command(new CommandTownDisband());
         manager.command(new CommandTownInfo<>());
+        manager.command(new CommandTownJoin());
+        manager.command(new CommandTownKick());
+        manager.command(new CommandTownLeave());
         manager.command(new CommandTownList<>());
         manager.command(new CommandTownOnline());
         manager.command(new CommandTownResidents());
         manager.command(new CommandTownSetName());
+        manager.command(new CommandTownSetOpen());
         manager.command(new CommandTownSetSlogan());
     }
 }

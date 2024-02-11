@@ -4,20 +4,20 @@ import org.bukkit.event.Cancellable;
 import org.bukkit.event.HandlerList;
 import org.jetbrains.annotations.NotNull;
 import town.bunger.towns.api.resident.ResidentView;
-import town.bunger.towns.api.town.Town;
+import town.bunger.towns.api.town.TownView;
 
 public final class JoinTownResidentEvent extends ResidentViewEvent implements Cancellable {
     private static final HandlerList HANDLERS = new HandlerList();
 
-    private final Town town;
+    private final TownView town;
     private boolean cancelled = false;
 
-    public JoinTownResidentEvent(ResidentView resident, Town town) {
+    public JoinTownResidentEvent(ResidentView resident, TownView town) {
         super(resident);
         this.town = town;
     }
 
-    public Town town() {
+    public TownView town() {
         return this.town;
     }
 

@@ -18,7 +18,7 @@ public interface Resident extends ResidentView {
      *
      * @return True if the resident's town was left or if the resident was not a member of a town
      */
-    boolean leaveTown();
+    CompletableFuture<Boolean> leaveTown();
 
     /**
      * Joins a town.
@@ -26,5 +26,5 @@ public interface Resident extends ResidentView {
      * @param town The town
      * @return True if the new town was joined or if the resident was already a member of the town
      */
-    boolean joinTown(Town town);
+    CompletableFuture<Boolean> joinTown(Town town);
 }

@@ -1,5 +1,7 @@
 package town.bunger.towns.plugin;
 
+import org.apiguardian.api.API;
+import org.bukkit.NamespacedKey;
 import org.bukkit.plugin.ServicePriority;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jspecify.annotations.Nullable;
@@ -18,8 +20,14 @@ public final class BungerTownsPlugin extends JavaPlugin {
 
     private static @Nullable BungerTownsPlugin instance = null;
 
+    @API(status = API.Status.INTERNAL)
     public static BungerTownsPlugin getInstance() {
         return Objects.requireNonNull(instance, "BungerTowns is not enabled");
+    }
+
+    @API(status = API.Status.INTERNAL)
+    public static NamespacedKey key(String key) {
+        return new NamespacedKey(getInstance(), key);
     }
 
     @Override

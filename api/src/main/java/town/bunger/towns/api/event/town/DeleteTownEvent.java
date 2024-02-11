@@ -1,29 +1,28 @@
-package town.bunger.towns.api.event.resident;
+package town.bunger.towns.api.event.town;
 
 import org.bukkit.event.Cancellable;
+import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 import org.jetbrains.annotations.NotNull;
-import town.bunger.towns.api.resident.ResidentView;
 import town.bunger.towns.api.town.TownView;
 
-public final class LeaveTownResidentEvent extends ResidentViewEvent implements Cancellable {
+public final class DeleteTownEvent extends Event implements Cancellable {
     private static final HandlerList HANDLERS = new HandlerList();
 
     private final TownView town;
     private boolean cancelled = false;
 
-    public LeaveTownResidentEvent(ResidentView resident, TownView town) {
-        super(resident);
+    public DeleteTownEvent(TownView town) {
         this.town = town;
     }
 
     public TownView town() {
-        return this.town;
+        return town;
     }
 
     @Override
     public boolean isCancelled() {
-        return this.cancelled;
+        return cancelled;
     }
 
     @Override

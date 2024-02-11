@@ -12,6 +12,7 @@ import town.bunger.towns.api.town.Town;
 import town.bunger.towns.api.town.TownManager;
 import town.bunger.towns.impl.BungerTownsImpl;
 import town.bunger.towns.impl.resident.ResidentImpl;
+import town.bunger.towns.impl.resident.WrappedResidentView;
 import town.bunger.towns.plugin.db.Tables;
 import town.bunger.towns.plugin.db.tables.records.TownRecord;
 import town.bunger.towns.plugin.util.MainThreadExecutor;
@@ -180,7 +181,7 @@ public final class TownManagerImpl implements TownManager {
         return CompletableFuture
             .runAsync(() -> {
                 // Let other plugins cancel town creation
-                var createEvent = new CreateTownEvent(new TownBuilderView(data), owner);
+                var createEvent = new CreateTownEvent(new TownBuilderView(data), new WrappedResidentView(owner));
                 Bukkit.getPluginManager().callEvent(createEvent);
                 if (createEvent.isCancelled()) {
                     throw new IllegalStateException("Town creation was cancelled");
@@ -213,6 +214,28 @@ public final class TownManagerImpl implements TownManager {
     @Override
     public TownImpl.BuilderImpl builder() {
         return new TownImpl.BuilderImpl();
+    }
+
+    /**
+     * Asynchronously deletes a town.
+     *
+     * @return A future that completes with {@code true} when the town is deleted,
+     * or {@code false} if it could not be deleted
+     */
+    @API(status = API.Status.INTERNAL)
+    public CompletableFuture<Boolean> delete(TownImpl town) {
+        return this.api.db().ctx()
+            .deleteFrom(Tables.TOWN)
+            .where(Tables.TOWN.ID.eq(town.id()))
+            .executeAsync()
+            .thenApply(rows -> {
+                if (rows > 0) {
+                    this.namesToIds.invalidate(town.name());
+                    this.cache.synchronous().invalidate(town.id());
+                }
+                return rows > 0;
+            })
+            .toCompletableFuture();
     }
 
     private record TownLoader(BungerTownsImpl api) implements AsyncCacheLoader<Integer, TownImpl> {

@@ -13,12 +13,6 @@ import java.util.concurrent.CompletableFuture;
  */
 public interface Town extends TownView {
 
-    @Override
-    @Nullable Resident owner();
-
-    @Override
-    CompletableFuture<? extends Collection<? extends Resident>> residents();
-
     /**
      * Sets the name of the town.
      *
@@ -26,12 +20,41 @@ public interface Town extends TownView {
      */
     void setName(String name);
 
+    @Override
+    @Nullable Resident owner();
+
+    /**
+     * Sets the open status of the town.
+     *
+     * @param open The new open status
+     */
+    CompletableFuture<@Nullable Void> setOpen(boolean open);
+
     /**
      * Sets the slogan of the town.
      *
      * @param slogan The new slogan
      */
     void setSlogan(@Nullable String slogan);
+
+    @Override
+    CompletableFuture<? extends Collection<? extends Resident>> residents();
+
+    /**
+     * Kicks a resident from the town.
+     *
+     * @param resident The resident to kick
+     * @return True if the resident was kicked
+     */
+    CompletableFuture<Boolean> kick(Resident resident);
+
+    /**
+     * Asynchronously deletes the town.
+     *
+     * @return A future that completes with {@code true} when the town is deleted,
+     * or {@code false} if it could not be deleted
+     */
+    CompletableFuture<Boolean> delete();
 
     interface Builder {
 

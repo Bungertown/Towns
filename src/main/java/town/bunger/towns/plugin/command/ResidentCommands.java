@@ -20,7 +20,7 @@ public final class ResidentCommands {
 
         manager.command(base
             .senderType(Player.class)
-            .handler(context -> api.residents().load(context.sender().getUniqueId())
+            .handler(context -> api.residents().loadOrCreatePlayer(context.sender().getUniqueId())
                 .whenComplete((resident, ex) -> {
                     if (ex != null) {
                         context.sender().sendMessage(text("Failed to load resident data", NamedTextColor.RED));

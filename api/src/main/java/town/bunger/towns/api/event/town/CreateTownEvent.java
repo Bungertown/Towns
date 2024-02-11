@@ -4,17 +4,17 @@ import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 import org.jetbrains.annotations.NotNull;
-import town.bunger.towns.api.resident.Resident;
+import town.bunger.towns.api.resident.ResidentView;
 import town.bunger.towns.api.town.TownView;
 
 public final class CreateTownEvent extends Event implements Cancellable {
     private static final HandlerList HANDLERS = new HandlerList();
 
     private final TownView town;
-    private final Resident resident;
+    private final ResidentView resident;
     private boolean cancelled = false;
 
-    public CreateTownEvent(TownView town, Resident resident) {
+    public CreateTownEvent(TownView town, ResidentView resident) {
         this.resident = resident;
         this.town = town;
     }
@@ -23,7 +23,7 @@ public final class CreateTownEvent extends Event implements Cancellable {
         return this.town;
     }
 
-    public Resident resident() {
+    public ResidentView resident() {
         return this.resident;
     }
 

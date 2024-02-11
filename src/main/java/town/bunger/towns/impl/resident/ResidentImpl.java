@@ -27,7 +27,7 @@ public final class ResidentImpl implements Resident {
     private final String name;
     private final LocalDateTime created;
     private final @Nullable LocalDateTime lastJoined;
-    private @Nullable Integer townId;
+    private volatile @Nullable Integer townId;
     private final JsonObject metadata;
 
     /**
@@ -42,7 +42,7 @@ public final class ResidentImpl implements Resident {
     /**
      * Constructor for loading from the database.
      *
-     * @param api The API instance, for mutating the resident
+     * @param api    The API instance, for mutating the resident
      * @param record The database record
      */
     public ResidentImpl(BungerTownsImpl api, ResidentRecord record) {
@@ -82,18 +82,20 @@ public final class ResidentImpl implements Resident {
 
     @Override
     public @Nullable TownImpl town() {
-        if (this.townId == null) {
+        final Integer townId = this.townId;
+        if (townId == null) {
             return null;
         }
-        return this.api.towns().get(this.townId);
+        return this.api.towns().get(townId);
     }
 
     @Override
     public CompletableFuture<@Nullable TownImpl> loadTown() {
-        if (this.townId == null) {
+        final Integer townId = this.townId;
+        if (townId == null) {
             return CompletableFuture.completedFuture(null);
         }
-        return this.api.towns().load(this.townId);
+        return this.api.towns().load(townId);
     }
 
     /**
@@ -108,10 +110,11 @@ public final class ResidentImpl implements Resident {
 
     @Override
     public @Nullable String townName() {
-        if (this.townId == null) {
+        final Integer townId = this.townId;
+        if (townId == null) {
             return null;
         }
-        return this.api.towns().getName(this.townId);
+        return this.api.towns().getName(townId);
     }
 
     /**
@@ -120,46 +123,48 @@ public final class ResidentImpl implements Resident {
      * @param town The new town, or null
      */
     @API(status = API.Status.INTERNAL)
-    public void setTown(@Nullable TownImpl town) {
+    public CompletableFuture<@Nullable Void> setTown(@Nullable TownImpl town) {
         if (this.townId != null && town != null) {
-            throw new IllegalStateException(
+            return CompletableFuture.failedFuture(new IllegalStateException(
                 "Resident tried to swap towns, " +
-                "use Resident#leaveTown() followed by Resident#joinTown(Town) instead"
-            );
+                    "use Resident#leaveTown() followed by Resident#joinTown(Town) instead"
+            ));
         }
 
-        this.townId = town == null ? null : town.id();
-
         final Integer id = town == null ? null : town.id();
-        // TODO: switch to synchronous, or add atomic update?
-        this.api.db().ctx()
+        return this.api.db().ctx()
             .update(Tables.RESIDENT)
             .set(Tables.RESIDENT.TOWN_ID, id)
             .where(Tables.RESIDENT.ID.eq(this.id()))
-            .executeAsync();
+            .executeAsync()
+            .thenAccept(rows -> {
+                if (rows != 1) {
+                    throw new IllegalStateException("Failed to update resident town");
+                }
+                // Set if successful
+                this.townId = town == null ? null : town.id();
+            })
+            .toCompletableFuture();
     }
 
     @Override
-    public boolean leaveTown() {
-        if (this.townId == null) {
-            // Not in a town
-            return true;
-        }
-
-        final TownImpl town = this.api.towns().get(this.townId);
-        if (town != null) {
-            return town.removeResident(this);
-        }
-        return true;
+    public CompletableFuture<Boolean> leaveTown() {
+        return this.loadTown()
+            .thenCompose(town -> {
+                if (town == null) {
+                    // Not in a town
+                    return CompletableFuture.completedFuture(false);
+                }
+                return town.removeResident(this);
+            });
     }
 
     @Override
-    public boolean joinTown(Town town) {
+    public CompletableFuture<Boolean> joinTown(Town town) {
         Objects.requireNonNull(town, "Town was null, did you mean to call Resident#leaveTown()?");
         if (!(town instanceof TownImpl)) {
             throw new IllegalArgumentException("Invalid town type");
         }
-
         return ((TownImpl) town).addResident(this);
     }
 

@@ -94,6 +94,11 @@ public final class ResidentManagerImpl implements ResidentManager {
     }
 
     @Override
+    public Collection<String> allNames() {
+        return List.copyOf(this.uuidsToNames.asMap().values());
+    }
+
+    @Override
     public Collection<ResidentImpl> loaded() {
         return List.copyOf(this.cache.synchronous().asMap().values());
     }
@@ -104,8 +109,24 @@ public final class ResidentManagerImpl implements ResidentManager {
     }
 
     @Override
+    public @Nullable ResidentImpl get(String name) {
+        final UUID uuid = this.getUUID(name);
+        return uuid != null ? this.cache.synchronous().getIfPresent(uuid) : null;
+    }
+
+    @Override
     public @Nullable String getName(UUID uuid) {
         return this.uuidsToNames.getIfPresent(uuid);
+    }
+
+    @Override
+    public @Nullable UUID getUUID(String name) {
+        // Find the first UUID with a matching name
+        return this.uuidsToNames.asMap().entrySet().stream()
+            .filter(entry -> entry.getValue().equals(name))
+            .findFirst()
+            .map(Map.Entry::getKey)
+            .orElse(null);
     }
 
     @Override
@@ -119,7 +140,7 @@ public final class ResidentManagerImpl implements ResidentManager {
     }
 
     @Override
-    public CompletableFuture<ResidentImpl> load(UUID uuid) {
+    public CompletableFuture<ResidentImpl> loadOrCreatePlayer(UUID uuid) {
         if (this.uuidsToNames.getIfPresent(uuid) == null) {
             return CompletableFuture.completedFuture(null);
         }
@@ -127,7 +148,14 @@ public final class ResidentManagerImpl implements ResidentManager {
     }
 
     @Override
-    public CompletableFuture<? extends Map<UUID, ResidentImpl>> loadAll(Collection<UUID> uuids) {
+    public CompletableFuture<@Nullable ResidentImpl> loadPlayer(String name) {
+        // Find the first UUID with a matching name
+        final UUID uuid = this.getUUID(name);
+        return uuid != null ? this.cache.get(uuid) : CompletableFuture.completedFuture(null);
+    }
+
+    @Override
+    public CompletableFuture<? extends Map<UUID, ResidentImpl>> loadOrCreatePlayers(Collection<UUID> uuids) {
         return this.cache.getAll(uuids);
     }
 

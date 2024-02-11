@@ -3,11 +3,12 @@ package town.bunger.towns.impl.town;
 import com.google.gson.JsonObject;
 import net.kyori.adventure.audience.Audience;
 import org.apiguardian.api.API;
-import org.bukkit.Bukkit;
 import org.jetbrains.annotations.NotNull;
 import org.jspecify.annotations.Nullable;
 import town.bunger.towns.api.event.resident.JoinTownResidentEvent;
 import town.bunger.towns.api.event.resident.LeaveTownResidentEvent;
+import town.bunger.towns.api.event.town.DeleteTownEvent;
+import town.bunger.towns.api.event.town.KickResidentTownEvent;
 import town.bunger.towns.api.resident.Resident;
 import town.bunger.towns.api.town.Town;
 import town.bunger.towns.impl.BungerTownsImpl;
@@ -16,6 +17,7 @@ import town.bunger.towns.impl.resident.WrappedResidentView;
 import town.bunger.towns.plugin.db.Tables;
 import town.bunger.towns.plugin.db.tables.records.TownRecord;
 import town.bunger.towns.plugin.jooq.JsonUtil;
+import town.bunger.towns.plugin.util.MainThreadExecutor;
 
 import java.time.LocalDateTime;
 import java.util.Collection;
@@ -32,7 +34,7 @@ public final class TownImpl implements Town {
     private String name;
     private final LocalDateTime created;
     private final UUID ownerId;
-    private final boolean open;
+    private volatile boolean open;
     private final boolean public_;
     private @Nullable String slogan;
     private final JsonObject metadata;
@@ -136,6 +138,22 @@ public final class TownImpl implements Town {
     }
 
     @Override
+    public CompletableFuture<@Nullable Void> setOpen(boolean open) {
+        if (this.open == open) {
+            // No change
+            return CompletableFuture.completedFuture(null);
+        }
+
+        return this.api.db().ctx()
+            .update(Tables.TOWN)
+            .set(Tables.TOWN.OPEN, open)
+            .where(Tables.TOWN.ID.eq(this.id))
+            .executeAsync()
+            .toCompletableFuture()
+            .thenAccept($ -> this.open = open);
+    }
+
+    @Override
     public boolean isPublic() {
         return this.public_;
     }
@@ -177,7 +195,33 @@ public final class TownImpl implements Town {
 
     @Override
     public CompletableFuture<? extends Collection<ResidentImpl>> residents() {
-        return this.api.residents().loadAll(this.residents).thenApply(residents -> List.copyOf(residents.values()));
+        return this.api.residents().loadOrCreatePlayers(this.residents).thenApply(residents -> List.copyOf(residents.values()));
+    }
+
+    @Override
+    public CompletableFuture<Boolean> kick(Resident r) {
+        if (!(r instanceof ResidentImpl resident)) {
+            return CompletableFuture.failedFuture(new IllegalArgumentException("Invalid resident type"));
+        }
+
+        final Integer id = resident.townId();
+        if (id == null || id != this.id) {
+            // Not in this town
+            return CompletableFuture.completedFuture(false);
+        }
+
+        // Let plugins cancel kicking a resident
+        var kickEvent = new KickResidentTownEvent(new WrappedTownView(this), new WrappedResidentView(resident));
+        CompletableFuture<Boolean> cancelledFuture = MainThreadExecutor.callEventAsync(kickEvent);
+
+        return cancelledFuture.thenCompose(cancelled -> {
+            if (cancelled) {
+                return CompletableFuture.completedFuture(false);
+            }
+            return resident.setTown(null)
+                .thenApply($ -> this.residents.remove(resident.id()))
+                .exceptionally($ -> false);
+        });
     }
 
     /**
@@ -188,25 +232,27 @@ public final class TownImpl implements Town {
      * false if they were in a different town or the addition was cancelled
      */
     @API(status = API.Status.INTERNAL)
-    public boolean addResident(ResidentImpl resident) {
+    public CompletableFuture<Boolean> addResident(ResidentImpl resident) {
         final Integer id = resident.townId();
         if (id != null) {
             // Already in a town
             // true  = same town
             // false = different town
-            return id == this.id;
+            return CompletableFuture.completedFuture(id == this.id);
         }
 
         // Let plugins cancel joining a town
-        var joinEvent = new JoinTownResidentEvent(new WrappedResidentView(resident), this);
-        Bukkit.getPluginManager().callEvent(joinEvent);
-        if (joinEvent.isCancelled()) {
-            return false;
-        }
+        var joinEvent = new JoinTownResidentEvent(new WrappedResidentView(resident), new WrappedTownView(this));
+        CompletableFuture<Boolean> cancelledFuture = MainThreadExecutor.callEventAsync(joinEvent);
 
-        resident.setTown(this);
-        this.residents.add(resident.id());
-        return true;
+        return cancelledFuture.thenCompose(cancelled -> {
+            if (cancelled) {
+                return CompletableFuture.completedFuture(false);
+            }
+            return resident.setTown(this)
+                .thenApply($ -> this.residents.add(resident.id()))
+                .exceptionally($ -> false);
+        });
     }
 
     /**
@@ -216,28 +262,51 @@ public final class TownImpl implements Town {
      * @return True if the resident was removed, false if they weren't in this town or the removal was cancelled
      */
     @API(status = API.Status.INTERNAL)
-    public boolean removeResident(ResidentImpl resident) {
+    public CompletableFuture<Boolean> removeResident(ResidentImpl resident) {
         final Integer id = resident.townId();
         if (id == null || id != this.id) {
             // Not in this town
-            return false;
+            return CompletableFuture.completedFuture(false);
         }
 
         // Let plugins cancel leaving a town
-        var leaveEvent = new LeaveTownResidentEvent(new WrappedResidentView(resident), this);
-        Bukkit.getPluginManager().callEvent(leaveEvent);
-        if (leaveEvent.isCancelled()) {
-            return false;
-        }
+        var leaveEvent = new LeaveTownResidentEvent(new WrappedResidentView(resident), new WrappedTownView(this));
+        CompletableFuture<Boolean> cancelledFuture = MainThreadExecutor.callEventAsync(leaveEvent);
 
-        resident.setTown(null);
-        this.residents.remove(resident.id());
-        return true;
+        return cancelledFuture.thenCompose(cancelled -> {
+                if (cancelled) {
+                    return CompletableFuture.completedFuture(false);
+                }
+                return resident.setTown(null)
+                    .thenApply($ -> this.residents.remove(resident.id()))
+                    .exceptionally($ -> false);
+            });
     }
 
     @Override
     public boolean hasResident(UUID uuid) {
         return this.residents.contains(uuid);
+    }
+
+    @Override
+    public CompletableFuture<Boolean> delete() {
+        // Let plugins cancel deleting a town
+        var deleteEvent = new DeleteTownEvent(new WrappedTownView(this));
+        CompletableFuture<Boolean> cancelledFuture = MainThreadExecutor.callEventAsync(deleteEvent);
+
+        return cancelledFuture.thenCompose(cancelled -> {
+                if (cancelled) {
+                    return CompletableFuture.completedFuture(false);
+                }
+                // Remove all residents from the town
+                var removeResidentsFuture = CompletableFuture.allOf(
+                    this.loadedResidents().stream()
+                        .map(resident -> resident.setTown(null))
+                        .toArray(CompletableFuture[]::new)
+                );
+                // Then delete the town
+                return removeResidentsFuture.thenCompose($ -> this.api.towns().delete(this));
+            });
     }
 
     @Override
