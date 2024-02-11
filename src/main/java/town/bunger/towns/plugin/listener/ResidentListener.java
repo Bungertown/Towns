@@ -9,6 +9,8 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import town.bunger.towns.impl.BungerTownsImpl;
 import town.bunger.towns.impl.resident.ResidentImpl;
 
+import java.time.LocalDateTime;
+
 public record ResidentListener(BungerTownsImpl api) implements Listener {
 
     /**
@@ -37,11 +39,13 @@ public record ResidentListener(BungerTownsImpl api) implements Listener {
     @EventHandler(priority = EventPriority.MONITOR)
     public void setOnlineOnJoin(PlayerJoinEvent event) {
         final var future = this.api.residents().loadOrCreatePlayer(event.getPlayer().getUniqueId());
-        future.whenComplete((resident, ex) -> {
-            if (ex == null) {
-                resident.online = true;
-            }
-        });
+        future
+            .thenCompose(resident -> resident.setLastJoined(LocalDateTime.now()).thenApply($ -> resident))
+            .whenComplete((resident, ex) -> {
+                if (ex == null) {
+                    resident.online = true;
+                }
+            });
     }
 
     /**
@@ -49,7 +53,7 @@ public record ResidentListener(BungerTownsImpl api) implements Listener {
      */
     @EventHandler(priority = EventPriority.MONITOR)
     public void setOfflineOnLeave(PlayerQuitEvent event) {
-        // Only handle cached residents
+        // Online players are guaranteed to be cached
         final var resident = this.api.residents().get(event.getPlayer().getUniqueId());
         if (resident != null) {
             resident.online = false;

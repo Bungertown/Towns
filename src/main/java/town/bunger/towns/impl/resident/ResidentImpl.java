@@ -26,7 +26,7 @@ public final class ResidentImpl implements Resident {
     private final UUID uuid;
     private final String name;
     private final LocalDateTime created;
-    private final @Nullable LocalDateTime lastJoined;
+    private volatile @Nullable LocalDateTime lastJoined;
     private volatile @Nullable Integer townId;
     private final JsonObject metadata;
 
@@ -73,6 +73,23 @@ public final class ResidentImpl implements Resident {
     @Override
     public @Nullable LocalDateTime lastJoined() {
         return this.lastJoined;
+    }
+
+    @API(status = API.Status.INTERNAL)
+    public CompletableFuture<@Nullable Void> setLastJoined(LocalDateTime lastJoined) {
+        return this.api.db().ctx()
+            .update(Tables.RESIDENT)
+            .set(Tables.RESIDENT.LAST_JOINED, lastJoined)
+            .where(Tables.RESIDENT.ID.eq(this.id()))
+            .executeAsync()
+            .thenAccept(rows -> {
+                if (rows != 1) {
+                    throw new IllegalStateException("Failed to update resident last joined");
+                }
+                // Set if successful
+                this.lastJoined = lastJoined;
+            })
+            .toCompletableFuture();
     }
 
     @Override
