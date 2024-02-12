@@ -15,7 +15,7 @@ import town.bunger.towns.plugin.db.Tables;
 import town.bunger.towns.plugin.db.tables.records.ResidentRecord;
 import town.bunger.towns.plugin.jooq.JsonUtil;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
@@ -25,8 +25,8 @@ public final class ResidentImpl implements Resident {
     private final BungerTownsImpl api;
     private final UUID uuid;
     private final String name;
-    private final LocalDateTime created;
-    private volatile @Nullable LocalDateTime lastJoined;
+    private final Instant created;
+    private volatile @Nullable Instant lastJoined;
     private volatile @Nullable Integer townId;
     private final JsonObject metadata;
 
@@ -66,17 +66,17 @@ public final class ResidentImpl implements Resident {
     }
 
     @Override
-    public LocalDateTime created() {
+    public Instant created() {
         return this.created;
     }
 
     @Override
-    public @Nullable LocalDateTime lastJoined() {
+    public @Nullable Instant lastJoined() {
         return this.lastJoined;
     }
 
     @API(status = API.Status.INTERNAL)
-    public CompletableFuture<@Nullable Void> setLastJoined(LocalDateTime lastJoined) {
+    public CompletableFuture<@Nullable Void> setLastJoined(Instant lastJoined) {
         return this.api.db().ctx()
             .update(Tables.RESIDENT)
             .set(Tables.RESIDENT.LAST_JOINED, lastJoined)

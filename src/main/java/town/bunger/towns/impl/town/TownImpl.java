@@ -19,7 +19,7 @@ import town.bunger.towns.plugin.db.tables.records.TownRecord;
 import town.bunger.towns.plugin.jooq.JsonUtil;
 import town.bunger.towns.plugin.util.MainThreadExecutor;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
@@ -32,7 +32,7 @@ public final class TownImpl implements Town {
     private final BungerTownsImpl api;
     private final int id;
     private volatile String name;
-    private final LocalDateTime created;
+    private final Instant created;
     private final UUID ownerId;
     private volatile boolean open;
     private final boolean public_;
@@ -119,7 +119,7 @@ public final class TownImpl implements Town {
     }
 
     @Override
-    public LocalDateTime created() {
+    public Instant created() {
         return this.created;
     }
 
@@ -329,7 +329,7 @@ public final class TownImpl implements Town {
     public static final class BuilderImpl implements Town.Builder {
 
         public @Nullable String name;
-        public LocalDateTime created = LocalDateTime.now();
+        public Instant created = Instant.now();
         public @Nullable ResidentImpl owner;
         public boolean open;
         public boolean public_;
@@ -343,7 +343,7 @@ public final class TownImpl implements Town {
         }
 
         @Override
-        public Builder created(LocalDateTime created) {
+        public Builder created(Instant created) {
             this.created = Objects.requireNonNull(created, "created");
             return this;
         }

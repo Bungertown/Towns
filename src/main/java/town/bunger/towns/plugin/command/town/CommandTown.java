@@ -1,11 +1,11 @@
 package town.bunger.towns.plugin.command.town;
 
-import org.incendo.cloud.Command;
-import org.incendo.cloud.context.CommandContext;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.command.CommandSender;
 import org.checkerframework.checker.nullness.qual.NonNull;
+import org.incendo.cloud.Command;
+import org.incendo.cloud.context.CommandContext;
 import town.bunger.towns.api.town.Town;
 import town.bunger.towns.plugin.command.TownCommandBean;
 import town.bunger.towns.plugin.util.InfoScreen;

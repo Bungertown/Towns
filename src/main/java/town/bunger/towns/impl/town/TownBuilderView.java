@@ -8,7 +8,7 @@ import town.bunger.towns.api.resident.ResidentView;
 import town.bunger.towns.api.town.TownView;
 import town.bunger.towns.impl.resident.WrappedResidentView;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
@@ -29,7 +29,7 @@ public final class TownBuilderView implements TownView {
     }
 
     @Override
-    public LocalDateTime created() {
+    public Instant created() {
         return this.builder.created;
     }
 

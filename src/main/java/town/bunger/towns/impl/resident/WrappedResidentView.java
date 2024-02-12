@@ -9,7 +9,7 @@ import town.bunger.towns.api.town.TownView;
 import town.bunger.towns.impl.town.TownImpl;
 import town.bunger.towns.impl.town.WrappedTownView;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
@@ -32,12 +32,12 @@ public final class WrappedResidentView implements ResidentView {
     }
 
     @Override
-    public LocalDateTime created() {
+    public Instant created() {
         return this.resident.created();
     }
 
     @Override
-    public @Nullable LocalDateTime lastJoined() {
+    public @Nullable Instant lastJoined() {
         return this.resident.lastJoined();
     }
 

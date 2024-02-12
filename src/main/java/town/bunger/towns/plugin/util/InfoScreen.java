@@ -6,7 +6,7 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import town.bunger.towns.api.resident.Resident;
 import town.bunger.towns.api.town.Town;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.List;
 
 import static net.kyori.adventure.text.Component.text;
@@ -24,18 +24,18 @@ public final class InfoScreen {
             .hoverEvent(text("This is the player's 'UUID', or Universally Unique Identifier. " +
                 "It's used to identify the player across name changes.", NamedTextColor.GRAY))
             .build();
-        final LocalDateTime lastJoined = resident.lastJoined();
+        final Instant lastJoined = resident.lastJoined();
         final Component dates = text().append(
             text()
                 .append(
                     text("  Registered: ", NamedTextColor.DARK_GREEN),
-                    text(resident.created().format(DateFormats.DATE), NamedTextColor.GREEN)
+                    text(DateFormats.DATE.format(resident.created()), NamedTextColor.GREEN)
                 )
                 .hoverEvent(text("The player was first registered in the town system on this date.", NamedTextColor.GRAY)),
             text()
                 .append(
                     text(" Last Joined: ", NamedTextColor.DARK_GREEN),
-                    text(lastJoined != null ? lastJoined.format(DateFormats.DATE) : "*Never*", NamedTextColor.GREEN)
+                    text(lastJoined != null ? DateFormats.DATE.format(lastJoined) : "*Never*", NamedTextColor.GREEN)
                 )
                 .hoverEvent(text("The player last joined the server on this date.", NamedTextColor.GRAY))
         ).build();
@@ -62,7 +62,7 @@ public final class InfoScreen {
                 text()
                     .append(
                         text(" est. ", NamedTextColor.DARK_GREEN),
-                        text(town.created().format(DateFormats.DATE), NamedTextColor.GREEN)
+                        text(DateFormats.DATE.format(town.created()), NamedTextColor.GREEN)
                     )
                     .hoverEvent(text("The town was created on this date.", NamedTextColor.GRAY))
             ).build();

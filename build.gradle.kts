@@ -1,3 +1,4 @@
+import org.jooq.meta.jaxb.ForcedType
 import org.jooq.meta.jaxb.Logging
 
 plugins {
@@ -46,7 +47,7 @@ dependencies {
     implementation("org.spongepowered:configurate-hocon:4.1.2")
     // Caching
     implementation("com.github.ben-manes.caffeine:caffeine:3.1.8")
-    // Nullness
+    // Nullability annotations
     compileOnly("org.jspecify:jspecify:0.3.0")
     implementation(project(":api"))
 }
@@ -78,6 +79,12 @@ jooq {
                         includes = ".*"
                         excludes = "(flyway_schema_history)|(?i:information_schema\\..*)|(?i:system_lobs\\..*)"
                         schemaVersionProvider = "SELECT :schema_name || '_' || MAX(\"version\") FROM \"flyway_schema_history\"" // Grab version from Flyway
+                        forcedTypes = listOf(
+                                ForcedType().apply {
+                                    name = "INSTANT"
+                                    types = "(?i:TIMESTAMP\\ WITH\\ TIME\\ ZONE)"
+                                }
+                        )
                     }
                     generate.apply {
                         isDeprecated = false

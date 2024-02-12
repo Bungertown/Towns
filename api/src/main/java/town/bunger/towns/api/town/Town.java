@@ -4,7 +4,7 @@ import com.google.gson.JsonObject;
 import org.jspecify.annotations.Nullable;
 import town.bunger.towns.api.resident.Resident;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.Collection;
 import java.util.concurrent.CompletableFuture;
 
@@ -72,7 +72,7 @@ public interface Town extends TownView {
          * @param created The new creation time
          * @return This builder
          */
-        Builder created(LocalDateTime created);
+        Builder created(Instant created);
 
         /**
          * Sets the owner of the town.

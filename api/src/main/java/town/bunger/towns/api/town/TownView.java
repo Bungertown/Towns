@@ -6,7 +6,7 @@ import org.jspecify.annotations.Nullable;
 import town.bunger.towns.api.resident.Resident;
 import town.bunger.towns.api.resident.ResidentView;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.Collection;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
@@ -25,7 +25,7 @@ public interface TownView extends ForwardingAudience {
      *
      * @return The creation time
      */
-    LocalDateTime created();
+    Instant created();
 
     /**
      * Gets the owner of the town.

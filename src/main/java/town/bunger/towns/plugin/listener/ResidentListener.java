@@ -9,7 +9,7 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import town.bunger.towns.impl.BungerTownsImpl;
 import town.bunger.towns.impl.resident.ResidentImpl;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 public record ResidentListener(BungerTownsImpl api) implements Listener {
 
@@ -40,7 +40,7 @@ public record ResidentListener(BungerTownsImpl api) implements Listener {
     public void setOnlineOnJoin(PlayerJoinEvent event) {
         final var future = this.api.residents().loadOrCreatePlayer(event.getPlayer().getUniqueId());
         future
-            .thenCompose(resident -> resident.setLastJoined(LocalDateTime.now()).thenApply($ -> resident))
+            .thenCompose(resident -> resident.setLastJoined(Instant.now()).thenApply($ -> resident))
             .whenComplete((resident, ex) -> {
                 if (ex == null) {
                     resident.online = true;

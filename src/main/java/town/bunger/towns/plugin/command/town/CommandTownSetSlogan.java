@@ -5,8 +5,11 @@ import org.bukkit.command.CommandSender;
 import org.incendo.cloud.Command;
 import org.incendo.cloud.context.CommandContext;
 import org.incendo.cloud.parser.standard.StringParser;
+import org.jspecify.annotations.Nullable;
 import town.bunger.towns.api.town.Town;
 import town.bunger.towns.plugin.command.TownCommandBean;
+
+import java.util.concurrent.CompletableFuture;
 
 import static net.kyori.adventure.text.Component.text;
 
@@ -21,7 +24,7 @@ public final class CommandTownSetSlogan extends TownCommandBean<CommandSender> {
     }
 
     @Override
-    public void execute(
+    public CompletableFuture<@Nullable Void> executeFuture(
         CommandContext<CommandSender> context
     ) {
         final String slogan = context.<String>optional("slogan").orElse(null);
@@ -29,14 +32,20 @@ public final class CommandTownSetSlogan extends TownCommandBean<CommandSender> {
         final Town town = context.inject(Town.class).orElse(null);
         if (town == null) {
             context.sender().sendMessage(text("You are not in a town.", NamedTextColor.RED));
-            return;
+            return CompletableFuture.completedFuture(null);
         }
 
-        town.setSlogan(slogan);
-        if (slogan != null) {
-            context.sender().sendMessage(text("Set slogan to '" + slogan + "'", NamedTextColor.GREEN));
-        } else {
-            context.sender().sendMessage(text("Removed slogan.", NamedTextColor.GREEN));
-        }
+        return town.setSlogan(slogan)
+            .whenComplete(($, ex) -> {
+                if (ex != null) {
+                    context.sender().sendMessage(text("Failed to set town slogan", NamedTextColor.RED));
+                } else {
+                    if (slogan != null) {
+                        context.sender().sendMessage(text("Set town slogan to '" + slogan + "'", NamedTextColor.GREEN));
+                    } else {
+                        context.sender().sendMessage(text("Removed town slogan.", NamedTextColor.GREEN));
+                    }
+                }
+            });
     }
 }

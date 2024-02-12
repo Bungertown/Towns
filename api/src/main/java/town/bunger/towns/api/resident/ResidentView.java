@@ -5,7 +5,7 @@ import net.kyori.adventure.audience.ForwardingAudience;
 import org.jspecify.annotations.Nullable;
 import town.bunger.towns.api.town.TownView;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
@@ -30,14 +30,14 @@ public interface ResidentView extends ForwardingAudience.Single {
      *
      * @return The creation time
      */
-    LocalDateTime created();
+    Instant created();
 
     /**
      * Gets the last time the resident joined the server.
      *
      * @return The last join time
      */
-    @Nullable LocalDateTime lastJoined();
+    @Nullable Instant lastJoined();
 
     /**
      * Whether the resident is a member of a town.
