@@ -310,7 +310,9 @@ public final class TownImpl implements Town {
             if (cancelled) {
                 return CompletableFuture.completedFuture(false);
             }
-            // Remove all residents from the town
+            // Remove all cached residents from this town.
+            // Unloaded residents will be removed when the town is deleted in the DB,
+            // due to an SQL ON DELETE SET NULL constraint.
             var removeResidentsFuture = CompletableFuture.allOf(
                 this.loadedResidents().stream()
                     .map(resident -> resident.setTown(null))
