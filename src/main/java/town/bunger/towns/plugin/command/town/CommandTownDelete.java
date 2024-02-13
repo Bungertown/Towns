@@ -8,17 +8,18 @@ import org.slf4j.Logger;
 import town.bunger.towns.api.resident.Resident;
 import town.bunger.towns.api.town.Town;
 import town.bunger.towns.plugin.command.TownCommandBean;
+import town.bunger.towns.plugin.util.Notifications;
 
 import java.util.concurrent.CompletableFuture;
 
 import static town.bunger.towns.plugin.i18n.Messages.*;
 
-public final class CommandTownLeave extends TownCommandBean<CommandSender> {
+public final class CommandTownDelete extends TownCommandBean<CommandSender> {
 
     @Override
     protected Command.Builder<CommandSender> configure(Command.Builder<CommandSender> builder) {
         return builder
-            .literal("leave");
+            .literal("delete", "disband");
     }
 
     @Override
@@ -30,35 +31,32 @@ public final class CommandTownLeave extends TownCommandBean<CommandSender> {
             context.sender().sendMessage(ERROR_RESIDENT_NOT_LOADED);
             return CompletableFuture.completedFuture(null);
         }
-        if (!resident.hasTown()) {
+
+        final Town town = context.inject(Town.class).orElse(null);
+        if (town == null) {
             context.sender().sendMessage(ERROR_TOWN_MEMBERSHIP_REQUIRED);
             return CompletableFuture.completedFuture(null);
         }
+        final String townName = town.name();
 
-        final Town town = resident.town();
-        if (town == null) {
-            context.sender().sendMessage(ERROR_TOWN_NOT_LOADED);
+        if (!town.ownerId().equals(resident.id())) {
+            context.sender().sendMessage(ERROR_TOWN_OWNERSHIP_REQUIRED);
             return CompletableFuture.completedFuture(null);
         }
 
-        if (town.ownerId().equals(resident.id())) {
-            context.sender().sendMessage(ERROR_TOWN_OWNERSHIP_CANNOT_LEAVE);
-            return CompletableFuture.completedFuture(null);
-        }
-
-        return resident.leaveTown()
-            .thenAccept(left -> {
-                if (left) {
-                    town.sendMessage(NOTIFY_TOWN_LEFT_OTHER(town.name(), resident.name()));
-                    context.sender().sendMessage(NOTIFY_TOWN_LEFT_SELF(town.name()));
-                    logger.info(resident.name() + "left the town of " + town.name());
+        return town.delete()
+            .thenAccept(deleted -> {
+                if (deleted) {
+                    Notifications.TOWN_DELETED.sendMessage(NOTIFY_TOWN_DELETED_OTHER(townName, resident.name()));
+                    context.sender().sendMessage(NOTIFY_TOWN_DELETED_SELF(townName));
+                    logger.info(resident.name() + " deleted the town of " + townName);
                 } else {
-                    context.sender().sendMessage(ERROR_TOWN_LEAVE_FAILED(town.name()));
+                    context.sender().sendMessage(ERROR_TOWN_DELETE_FAILED(townName));
                 }
             })
             .exceptionally(ex -> {
-                context.sender().sendMessage(ERROR_TOWN_LEAVE_FAILED(town.name()));
-                logger.error("Failed to leave the town of " + town.name(), ex);
+                context.sender().sendMessage(ERROR_TOWN_DELETE_FAILED(townName));
+                logger.error("Failed to delete the town of " + townName, ex);
                 return null;
             });
     }

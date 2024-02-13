@@ -1,10 +1,10 @@
 package town.bunger.towns.plugin.command.town;
 
-import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.command.CommandSender;
 import org.incendo.cloud.Command;
 import org.incendo.cloud.context.CommandContext;
 import org.jspecify.annotations.Nullable;
+import org.slf4j.Logger;
 import town.bunger.towns.api.command.ResidentParser;
 import town.bunger.towns.api.resident.Resident;
 import town.bunger.towns.api.town.Town;
@@ -12,7 +12,7 @@ import town.bunger.towns.plugin.command.TownCommandBean;
 
 import java.util.concurrent.CompletableFuture;
 
-import static net.kyori.adventure.text.Component.text;
+import static town.bunger.towns.plugin.i18n.Messages.*;
 
 public final class CommandTownKick extends TownCommandBean<CommandSender> {
 
@@ -25,22 +25,34 @@ public final class CommandTownKick extends TownCommandBean<CommandSender> {
 
     @Override
     public CompletableFuture<@Nullable Void> executeFuture(CommandContext<CommandSender> context) {
+        final Logger logger = context.inject(Logger.class).orElseThrow();
+
+        final Resident source = context.inject(Resident.class).orElse(null);
+        final String sourceName = source != null ? source.name() : "$CONSOLE";
+
         final Town town = context.inject(Town.class).orElse(null);
         if (town == null) {
-            context.sender().sendMessage(text("You are not a member of a town.", NamedTextColor.RED));
+            context.sender().sendMessage(ERROR_TOWN_MEMBERSHIP_REQUIRED);
             return CompletableFuture.completedFuture(null);
         }
 
-        final Resident resident = context.get("resident");
+        final Resident target = context.get("resident");
 
-        return town.kick(resident)
+        return town.kick(target)
             .thenAccept(kicked -> {
                 if (kicked) {
-                    resident.sendMessage(text("You were kicked from your town.", NamedTextColor.RED));
-                    context.sender().sendMessage(text("You kicked " + resident.name() + " from your town.", NamedTextColor.GREEN));
+                    town.sendMessage(NOTIFY_TOWN_KICKED_OTHER(town.name(), target.name(), sourceName));
+                    context.sender().sendMessage(NOTIFY_TOWN_KICKED_SOURCE(town.name(), target.name()));
+                    target.sendMessage(NOTIFY_TOWN_KICKED_TARGET(town.name()));
+                    logger.info(sourceName + " kicked " + target.name() + " from the town of " + town.name());
                 } else {
-                    context.sender().sendMessage(text("You could not kick " + resident.name() + " from your town.", NamedTextColor.RED));
+                    context.sender().sendMessage(ERROR_TOWN_KICK_FAILED(town.name(), target.name()));
                 }
+            })
+            .exceptionally(ex -> {
+                context.sender().sendMessage(ERROR_TOWN_KICK_FAILED(town.name(), target.name()));
+                logger.error("Failed to kick " + target.name() + " from the town of " + town.name(), ex);
+                return null;
             });
     }
 }

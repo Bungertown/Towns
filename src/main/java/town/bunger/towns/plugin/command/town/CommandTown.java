@@ -1,7 +1,6 @@
 package town.bunger.towns.plugin.command.town;
 
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.command.CommandSender;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.incendo.cloud.Command;
@@ -12,7 +11,7 @@ import town.bunger.towns.plugin.util.InfoScreen;
 
 import java.util.List;
 
-import static net.kyori.adventure.text.Component.text;
+import static town.bunger.towns.plugin.i18n.Messages.ERROR_TOWN_MEMBERSHIP_REQUIRED;
 
 public final class CommandTown<C extends CommandSender> extends TownCommandBean<C> {
 
@@ -25,7 +24,7 @@ public final class CommandTown<C extends CommandSender> extends TownCommandBean<
     public void execute(@NonNull CommandContext<C> context) {
         final Town town = context.inject(Town.class).orElse(null);
         if (town == null) {
-            context.sender().sendMessage(text("You are not in a town.", NamedTextColor.RED));
+            context.sender().sendMessage(ERROR_TOWN_MEMBERSHIP_REQUIRED);
             return;
         }
 

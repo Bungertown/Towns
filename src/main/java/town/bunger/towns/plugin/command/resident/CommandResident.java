@@ -1,7 +1,6 @@
 package town.bunger.towns.plugin.command.resident;
 
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.command.CommandSender;
 import org.incendo.cloud.Command;
 import org.incendo.cloud.context.CommandContext;
@@ -11,7 +10,7 @@ import town.bunger.towns.plugin.util.InfoScreen;
 
 import java.util.List;
 
-import static net.kyori.adventure.text.Component.text;
+import static town.bunger.towns.plugin.i18n.Messages.ERROR_RESIDENT_NOT_LOADED;
 
 public final class CommandResident<C extends CommandSender> extends ResidentCommandBean<C> {
 
@@ -24,7 +23,7 @@ public final class CommandResident<C extends CommandSender> extends ResidentComm
     public void execute(CommandContext<C> context) {
         final Resident resident = context.inject(Resident.class).orElse(null);
         if (resident == null) {
-            context.sender().sendMessage(text("You are not a resident of any town.", NamedTextColor.RED));
+            context.sender().sendMessage(ERROR_RESIDENT_NOT_LOADED);
             return;
         }
 

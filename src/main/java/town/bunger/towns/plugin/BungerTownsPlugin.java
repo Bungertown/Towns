@@ -10,6 +10,7 @@ import town.bunger.towns.impl.BungerTownsImpl;
 import town.bunger.towns.plugin.command.CommandManager;
 import town.bunger.towns.plugin.config.ConfigManager;
 import town.bunger.towns.plugin.db.DatabaseManager;
+import town.bunger.towns.plugin.i18n.TranslationManager;
 import town.bunger.towns.plugin.listener.ResidentListener;
 
 import java.io.IOException;
@@ -52,6 +53,8 @@ public final class BungerTownsPlugin extends JavaPlugin {
             this.getServer().getPluginManager().disablePlugin(this);
             return;
         }
+
+        TranslationManager.register();
 
         var database = new DatabaseManager(config.database(), this);
         database.migrate(config.database(), this);

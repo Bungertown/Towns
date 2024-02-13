@@ -1,124 +1,99 @@
 package town.bunger.towns.plugin.util;
 
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.event.ClickEvent;
-import net.kyori.adventure.text.format.NamedTextColor;
 import town.bunger.towns.api.resident.Resident;
 import town.bunger.towns.api.town.Town;
 
-import java.time.Instant;
 import java.util.List;
 
+import static net.kyori.adventure.text.Component.space;
 import static net.kyori.adventure.text.Component.text;
-import static net.kyori.adventure.text.format.TextColor.color;
+import static town.bunger.towns.plugin.i18n.Messages.*;
 
+/**
+ * A collection of {@link Component}s for displaying information on the screen.
+ */
 public final class InfoScreen {
 
+    /**
+     * A {@link Component} representing a space.
+     */
+    public static final Component SPACE = space();
+
+    /**
+     * A {@link Component} representing two spaces.
+     */
+    public static final Component DOUBLE_SPACE = text("  ");
+
+    /**
+     * Print information about a resident.
+     *
+     * @param resident The resident
+     * @return The information
+     */
     public static List<Component> printResident(final Resident resident) {
         final Component banner = TextBanner.create(resident.name());
         final Component uuid = text()
             .append(
-                text("  UUID: ", NamedTextColor.DARK_GREEN),
-                text(resident.id().toString(), NamedTextColor.GREEN)
-            )
-            .hoverEvent(text("This is the player's 'UUID', or Universally Unique Identifier. " +
-                "It's used to identify the player across name changes.", NamedTextColor.GRAY))
-            .build();
-        final Instant lastJoined = resident.lastJoined();
-        final Component dates = text().append(
-            text()
-                .append(
-                    text("  Registered: ", NamedTextColor.DARK_GREEN),
-                    text(DateFormats.DATE.format(resident.created()), NamedTextColor.GREEN)
-                )
-                .hoverEvent(text("The player was first registered in the town system on this date.", NamedTextColor.GRAY)),
-            text()
-                .append(
-                    text(" Last Joined: ", NamedTextColor.DARK_GREEN),
-                    text(lastJoined != null ? DateFormats.DATE.format(lastJoined) : "*Never*", NamedTextColor.GREEN)
-                )
-                .hoverEvent(text("The player last joined the server on this date.", NamedTextColor.GRAY))
-        ).build();
-        final String townName = resident.townName();
+                DOUBLE_SPACE,
+                SCREEN_RESIDENT_UUID_TEXT(resident.id())
+            ).build();
+        final Component dates = text()
+            .append(
+                DOUBLE_SPACE,
+                SCREEN_RESIDENT_CREATED_TEXT(resident.created()),
+                SPACE,
+                SCREEN_RESIDENT_LAST_JOINED_TEXT(resident.lastJoined())
+            ).build();
         final Component town = text()
             .append(
-                text("  Town: ", NamedTextColor.DARK_GREEN),
-                text(townName != null ? townName : "*none*", NamedTextColor.GREEN)
-            )
-            .hoverEvent(text("The town the player is a member of." + (townName != null ? "\n\nClick to view their town." : ""), NamedTextColor.GRAY))
-            .clickEvent(townName != null ? ClickEvent.runCommand("/town info " + townName) : null)
-            .build();
-
+                DOUBLE_SPACE,
+                SCREEN_RESIDENT_TOWN_TEXT(resident.townName())
+            ).build();
         return List.of(banner, uuid, dates, town);
     }
 
+    /**
+     * Print information about a town.
+     *
+     * @param town The town
+     * @return The information
+     */
     public static List<Component> printTown(final Town town) {
         final Component banner = TextBanner.create(town.name());
-        final String slogan = town.slogan();
         final Component sloganEst = text()
             .append(
-                text("  \"" + (slogan != null ? slogan : "YOUR SLOGAN HERE") + "\"", color(73, 189, 227)) // TODO
-                    .hoverEvent(text("The town's slogan, or message of the day.", NamedTextColor.GRAY)),
-                text()
-                    .append(
-                        text(" est. ", NamedTextColor.DARK_GREEN),
-                        text(DateFormats.DATE.format(town.created()), NamedTextColor.GREEN)
-                    )
-                    .hoverEvent(text("The town was created on this date.", NamedTextColor.GRAY))
+                DOUBLE_SPACE,
+                SCREEN_TOWN_SLOGAN_TEXT(town.slogan()),
+                SPACE,
+                SCREEN_TOWN_CREATED_TEXT(town.created())
             ).build();
         final Component mayorFounder = text()
             .append(
-                text()
-                    .append(
-                        text("  Mayor: ", NamedTextColor.DARK_GREEN),
-                        text(town.ownerName(), NamedTextColor.GREEN)
-                    )
-                    .hoverEvent(text("The player who currently runs the town.", NamedTextColor.GRAY)),
-                text()
-                    .append(
-                        text(" Founder: ", NamedTextColor.DARK_GREEN),
-                        text(town.ownerName(), NamedTextColor.GREEN) // TODO
-                    )
-                    .hoverEvent(text("The player who created the town.", NamedTextColor.GRAY))
+                DOUBLE_SPACE,
+                SCREEN_TOWN_MAYOR_TEXT(town.ownerName()),
+                SPACE,
+                SCREEN_TOWN_FOUNDER_TEXT(town.ownerName()) // TODO: founder not owner
             ).build();
         final Component townSize = text()
             .append(
-                text()
-                    .append(
-                        text("  Town Size: ", NamedTextColor.DARK_GREEN),
-                        text("69/420", NamedTextColor.GREEN) // TODO
-                    )
-                    .hoverEvent(text("The number of chunks the town has claimed out of the total number of chunks they can claim.", NamedTextColor.GRAY)),
-                text()
-                    .append(
-                        text(" +41", color(73, 189, 227))
-                    )
-                    .hoverEvent(text("The number of chunks the town is awarded as a bonus through various factors.", NamedTextColor.GRAY))
+                DOUBLE_SPACE,
+                SCREEN_TOWN_SIZE_TEXT(69, 420), // TODO
+                SPACE,
+                SCREEN_TOWN_SIZE_BONUS_TEXT(41) // TODO
             ).build();
         final Component economy = text()
             .append(
-                text()
-                    .append(
-                        text("  Bank: ", NamedTextColor.DARK_GREEN),
-                        text("$69,420", NamedTextColor.GREEN) // TODO
-                    )
-                    .hoverEvent(text("The amount of money the town has in its bank.", NamedTextColor.GRAY)),
-                text()
-                    .append(
-                        text(" Upkeep: ", NamedTextColor.DARK_GREEN),
-                        text("$420", NamedTextColor.RED) // TODO
-                    )
-                    .hoverEvent(text("The amount of money the town must pay to keep its chunks claimed.", NamedTextColor.GRAY))
+                DOUBLE_SPACE,
+                SCREEN_TOWN_BANK_TEXT("$69,420"), // TODO
+                SPACE,
+                SCREEN_TOWN_UPKEEP_TEXT("$420") // TODO
             ).build();
         final Component buttons = text()
-            .color(NamedTextColor.GRAY)
             .append(
-                text("  ["),
-                text(town.residentIds().size() + " Residents", NamedTextColor.GREEN) // TODO
-                    .hoverEvent(text("Click to view the residents of the town.", NamedTextColor.GRAY)),
-                text("]")
+                DOUBLE_SPACE,
+                SCREEN_TOWN_BTN_RESIDENTS_TEXT(town.name(), town.residentIds().size())
             ).build();
-
         return List.of(banner, sloganEst, mayorFounder, townSize, economy, buttons);
     }
 }

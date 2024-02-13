@@ -12,6 +12,8 @@ import town.bunger.towns.plugin.util.TextBanner;
 
 import java.util.concurrent.CompletableFuture;
 
+import static net.kyori.adventure.text.Component.text;
+
 public final class CommandTownList<C extends Audience> extends TownCommandBean<C> {
 
     public static final Component BANNER = TextBanner.create("Towns");
@@ -32,7 +34,7 @@ public final class CommandTownList<C extends Audience> extends TownCommandBean<C
         // TODO: SQL pagination
         return api.towns().all().thenAccept(towns -> {
             for (var town : towns) {
-                context.sender().sendMessage(Component.text("  " + town.name(), NamedTextColor.GREEN));
+                context.sender().sendMessage(text("  " + town.name(), NamedTextColor.GREEN));
             }
         });
     }

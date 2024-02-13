@@ -45,7 +45,7 @@ public class CommandManager {
     public void registerTownCommands() {
         manager.command(new CommandTown<>());
         manager.command(new CommandTownCreate());
-        manager.command(new CommandTownDisband());
+        manager.command(new CommandTownDelete());
         manager.command(new CommandTownInfo<>());
         manager.command(new CommandTownJoin());
         manager.command(new CommandTownKick());

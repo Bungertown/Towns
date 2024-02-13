@@ -13,6 +13,7 @@ import town.bunger.towns.plugin.command.TownCommandBean;
 import town.bunger.towns.plugin.util.TextBanner;
 
 import static net.kyori.adventure.text.Component.text;
+import static town.bunger.towns.plugin.i18n.Messages.ERROR_TOWN_MUST_SPECIFY_ARGUMENT;
 
 public final class CommandTownOnline extends TownCommandBean<CommandSender> {
 
@@ -33,7 +34,7 @@ public final class CommandTownOnline extends TownCommandBean<CommandSender> {
             .or(() -> context.inject(Town.class))
             .orElse(null);
         if (town == null) {
-            context.sender().sendMessage(text("Must specify a town.", NamedTextColor.RED));
+            context.sender().sendMessage(ERROR_TOWN_MUST_SPECIFY_ARGUMENT);
             return;
         }
 
